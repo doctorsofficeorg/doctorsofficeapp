@@ -1,35 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Stethoscope } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+function OAuthCodeHandler() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
-  // Handle OAuth code exchange when redirected back with ?code=
   useEffect(() => {
     const code = searchParams.get("code");
     if (code) {
-      setLoading(true);
       const supabase = createClient();
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) {
-          setError("Authentication failed. Please try again.");
-          setLoading(false);
-        } else {
+        if (!error) {
           router.push("/dashboard");
           router.refresh();
         }
       });
     }
   }, [searchParams, router]);
+
+  return null;
+}
+
+export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,6 +74,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-pearl-gradient flex">
+      <Suspense fallback={null}>
+        <OAuthCodeHandler />
+      </Suspense>
       {/* Left — Branding panel */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-gradient-to-br from-[var(--color-teal-700)] to-[var(--color-teal-900)] p-12 relative overflow-hidden">
         <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-white/5" />
