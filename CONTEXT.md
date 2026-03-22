@@ -29,9 +29,12 @@
 - [x] Settings page (clinic profile, doctor profile forms)
 - [x] TypeScript types for all domain entities
 - [x] Utility functions (formatCurrency INR, formatDate, getInitials)
+- [x] Drizzle ORM schema (src/db/schema.ts) — all 8 tables with enums
+- [x] SQL migration (supabase/migrations/0001_initial_schema.sql) with RLS policies & realtime
+- [x] DB connection utility (src/db/index.ts) with postgres-js driver
+- [x] drizzle.config.ts for migration generation
 
 ### In Progress
-- [ ] Supabase database migrations & Drizzle ORM schema
 - [ ] Functional forms (patient create, prescription create, invoice create)
 - [ ] PDF generation for prescriptions & invoices
 - [ ] WhatsApp share via wa.me deep links
@@ -57,4 +60,4 @@ Before making changes:
 2. Run `git log --oneline -10` to verify current state
 3. Check src/types/index.ts for type definitions
 4. Check src/components/ui/ for available components
-5. Never assume DB schema — check supabase/migrations/
+5. Check src/db/schema.ts for Drizzle schema, supabase/migrations/ for raw SQL
