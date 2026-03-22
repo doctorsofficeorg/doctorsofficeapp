@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/layout";
 import { Card, CardTitle, Button, Badge } from "@/components/ui";
 import { Download, IndianRupee, TrendingUp, Receipt } from "lucide-react";

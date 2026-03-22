@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/layout";
 import { Card, CardHeader, CardTitle, Badge, Avatar, Button } from "@/components/ui";
 import {

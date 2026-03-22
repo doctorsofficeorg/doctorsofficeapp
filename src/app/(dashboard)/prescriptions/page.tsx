@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Header } from "@/components/layout";
 import { Card, CardTitle, Badge, Button } from "@/components/ui";
 import { Eye, FileText } from "lucide-react";
