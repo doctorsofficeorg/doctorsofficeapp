@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout";
-import { Card, Button, Badge, Avatar, Input } from "@/components/ui";
-import { Plus, Search, Phone, Filter, MoreHorizontal } from "lucide-react";
+import { Card, Badge, Avatar, Button } from "@/components/ui";
+import { Search, Phone, Filter, MoreHorizontal } from "lucide-react";
+import { PatientForm } from "@/components/forms/patient-form";
 
 const patients = [
   { id: "PT-A1B2C", name: "Rajesh Kumar", phone: "9876543210", age: 45, gender: "M", lastVisit: "20 Mar 2026", visits: 12, status: "active" },
@@ -15,10 +16,7 @@ export default function PatientsPage() {
   return (
     <>
       <Header title="Patients" subtitle="Manage your patient records">
-        <Button size="sm" variant="primary" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          New Patient
-        </Button>
+        <PatientForm clinicId="demo-clinic" />
       </Header>
 
       <div className="p-8 space-y-6 bg-pearl-gradient-subtle min-h-[calc(100vh-64px)]">

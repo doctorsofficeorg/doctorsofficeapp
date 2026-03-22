@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout";
 import { Card, CardTitle, Button, Badge, Avatar } from "@/components/ui";
-import { Plus, Download, Send, Eye, FileText } from "lucide-react";
+import { Download, Send, Eye, FileText } from "lucide-react";
+import { PrescriptionForm } from "@/components/forms/prescription-form";
 
 const prescriptions = [
   { id: "RX-001", patient: "Rajesh Kumar", diagnosis: "Upper respiratory tract infection", medicines: 3, date: "22 Mar 2026", status: "sent" },
@@ -14,10 +15,20 @@ export default function PrescriptionsPage() {
   return (
     <>
       <Header title="Prescriptions" subtitle="Create and manage prescriptions">
-        <Button size="sm" variant="primary" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          New Prescription
-        </Button>
+        <PrescriptionForm
+          clinicId="demo-clinic"
+          doctorId="demo-doctor"
+          patients={[
+            { id: "p1", name: "Rajesh Kumar" },
+            { id: "p2", name: "Priya Sharma" },
+            { id: "p3", name: "Amit Patel" },
+          ]}
+          appointments={[
+            { id: "a1", patientId: "p1", label: "Rajesh Kumar — Today" },
+            { id: "a2", patientId: "p2", label: "Priya Sharma — Today" },
+            { id: "a3", patientId: "p3", label: "Amit Patel — Today" },
+          ]}
+        />
       </Header>
 
       <div className="p-8 space-y-6 bg-pearl-gradient-subtle min-h-[calc(100vh-64px)]">

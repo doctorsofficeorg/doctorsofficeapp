@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout";
 import { Card, CardTitle, Button, Badge, Avatar } from "@/components/ui";
-import { Plus, Clock, ArrowRight, Phone, MessageCircle } from "lucide-react";
+import { Clock, ArrowRight, Phone, MessageCircle } from "lucide-react";
+import { AppointmentForm } from "@/components/forms/appointment-form";
 
 const queue = [
   { token: 1, name: "Rajesh Kumar", phone: "9876543210", time: "9:00 AM", complaint: "Fever, cough for 3 days", status: "done" as const, duration: "12 min" },
@@ -28,10 +29,16 @@ export default function AppointmentsPage() {
   return (
     <>
       <Header title="Today's Queue" subtitle="Saturday, 22 March 2026">
-        <Button size="sm" variant="primary" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Add Walk-in
-        </Button>
+        <AppointmentForm
+          clinicId="demo-clinic"
+          doctorId="demo-doctor"
+          patients={[
+            { id: "p1", name: "Rajesh Kumar" },
+            { id: "p2", name: "Priya Sharma" },
+            { id: "p3", name: "Amit Patel" },
+            { id: "p4", name: "Sunita Devi" },
+          ]}
+        />
       </Header>
 
       <div className="p-8 space-y-6 bg-pearl-gradient-subtle min-h-[calc(100vh-64px)]">

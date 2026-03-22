@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout";
 import { Card, CardTitle, Button, Badge } from "@/components/ui";
-import { Plus, Download, IndianRupee, TrendingUp, Receipt } from "lucide-react";
+import { Download, IndianRupee, TrendingUp, Receipt } from "lucide-react";
+import { InvoiceForm } from "@/components/forms/invoice-form";
 import { formatCurrency } from "@/lib/utils";
 
 const invoices = [
@@ -18,10 +19,14 @@ export default function BillingPage() {
   return (
     <>
       <Header title="Billing" subtitle="Invoices and payments">
-        <Button size="sm" variant="primary" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          New Invoice
-        </Button>
+        <InvoiceForm
+          clinicId="demo-clinic"
+          patients={[
+            { id: "p1", name: "Rajesh Kumar" },
+            { id: "p2", name: "Priya Sharma" },
+            { id: "p3", name: "Amit Patel" },
+          ]}
+        />
       </Header>
 
       <div className="p-8 space-y-6 bg-pearl-gradient-subtle min-h-[calc(100vh-64px)]">
