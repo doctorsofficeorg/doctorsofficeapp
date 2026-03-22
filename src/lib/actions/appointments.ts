@@ -1,27 +1,27 @@
 "use server";
 
 import { db } from "@/db";
-import { appointments } from "@/db/schema";
+import { appointments, patients } from "@/db/schema";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getSessionContext } from "@/lib/auth/session";
 
 export interface CreateAppointmentInput {
-  clinicId: string;
-  doctorId: string;
   patientId: string;
-  appointmentDate: string;
   chiefComplaint?: string;
 }
 
 export async function createAppointment(input: CreateAppointmentInput) {
-  // Get the next token number for this clinic + date
+  const { clinic, doctor } = await getSessionContext();
+  const today = new Date().toISOString().split("T")[0];
+
   const [result] = await db
     .select({ maxToken: sql<number>`COALESCE(MAX(${appointments.tokenNumber}), 0)` })
     .from(appointments)
     .where(
       and(
-        eq(appointments.clinicId, input.clinicId),
-        eq(appointments.appointmentDate, input.appointmentDate)
+        eq(appointments.clinicId, clinic.id),
+        eq(appointments.appointmentDate, today)
       )
     );
 
@@ -30,10 +30,10 @@ export async function createAppointment(input: CreateAppointmentInput) {
   const [appointment] = await db
     .insert(appointments)
     .values({
-      clinicId: input.clinicId,
-      doctorId: input.doctorId,
+      clinicId: clinic.id,
+      doctorId: doctor.id,
       patientId: input.patientId,
-      appointmentDate: input.appointmentDate,
+      appointmentDate: today,
       tokenNumber,
       status: "waiting",
       chiefComplaint: input.chiefComplaint || null,
@@ -66,15 +66,28 @@ export async function updateAppointmentStatus(
   return updated;
 }
 
-export async function getTodayQueue(clinicId: string) {
+export async function getTodayQueue() {
+  const { clinic } = await getSessionContext();
   const today = new Date().toISOString().split("T")[0];
 
   return db
-    .select()
+    .select({
+      id: appointments.id,
+      tokenNumber: appointments.tokenNumber,
+      status: appointments.status,
+      chiefComplaint: appointments.chiefComplaint,
+      startedAt: appointments.startedAt,
+      completedAt: appointments.completedAt,
+      createdAt: appointments.createdAt,
+      patientName: patients.fullName,
+      patientPhone: patients.phone,
+      patientId: patients.id,
+    })
     .from(appointments)
+    .innerJoin(patients, eq(appointments.patientId, patients.id))
     .where(
       and(
-        eq(appointments.clinicId, clinicId),
+        eq(appointments.clinicId, clinic.id),
         eq(appointments.appointmentDate, today)
       )
     )

@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { invoices, invoiceItems } from "@/db/schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { invoices, invoiceItems, patients } from "@/db/schema";
+import { eq, sql, desc, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getSessionContext } from "@/lib/auth/session";
 
 export interface InvoiceItemInput {
   description: string;
@@ -12,7 +13,6 @@ export interface InvoiceItemInput {
 }
 
 export interface CreateInvoiceInput {
-  clinicId: string;
   patientId: string;
   appointmentId?: string;
   gstPercent: number;
@@ -34,7 +34,8 @@ async function generateInvoiceNumber(clinicId: string): Promise<string> {
 }
 
 export async function createInvoice(input: CreateInvoiceInput) {
-  const invoiceNumber = await generateInvoiceNumber(input.clinicId);
+  const { clinic } = await getSessionContext();
+  const invoiceNumber = await generateInvoiceNumber(clinic.id);
 
   const subtotal = input.items.reduce(
     (sum, item) => sum + item.quantity * item.unitPrice,
@@ -46,7 +47,7 @@ export async function createInvoice(input: CreateInvoiceInput) {
   const [invoice] = await db
     .insert(invoices)
     .values({
-      clinicId: input.clinicId,
+      clinicId: clinic.id,
       patientId: input.patientId,
       appointmentId: input.appointmentId || null,
       invoiceNumber,
@@ -77,10 +78,26 @@ export async function createInvoice(input: CreateInvoiceInput) {
   return invoice;
 }
 
-export async function getInvoices(clinicId: string) {
+export async function getInvoices() {
+  const { clinic } = await getSessionContext();
+
   return db
-    .select()
+    .select({
+      id: invoices.id,
+      invoiceNumber: invoices.invoiceNumber,
+      subtotal: invoices.subtotal,
+      gstPercent: invoices.gstPercent,
+      gstAmount: invoices.gstAmount,
+      discount: invoices.discount,
+      total: invoices.total,
+      paymentMode: invoices.paymentMode,
+      paymentStatus: invoices.paymentStatus,
+      createdAt: invoices.createdAt,
+      patientName: patients.fullName,
+      patientPhone: patients.phone,
+    })
     .from(invoices)
-    .where(eq(invoices.clinicId, clinicId))
+    .innerJoin(patients, eq(invoices.patientId, patients.id))
+    .where(eq(invoices.clinicId, clinic.id))
     .orderBy(desc(invoices.createdAt));
 }

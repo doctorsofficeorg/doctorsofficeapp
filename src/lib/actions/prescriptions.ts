@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { prescriptions, prescriptionItems } from "@/db/schema";
+import { prescriptions, prescriptionItems, patients } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getSessionContext } from "@/lib/auth/session";
 
 export interface PrescriptionItemInput {
   medicineName: string;
@@ -15,8 +16,6 @@ export interface PrescriptionItemInput {
 }
 
 export interface CreatePrescriptionInput {
-  clinicId: string;
-  doctorId: string;
   patientId: string;
   appointmentId: string;
   diagnosis: string;
@@ -27,11 +26,13 @@ export interface CreatePrescriptionInput {
 }
 
 export async function createPrescription(input: CreatePrescriptionInput) {
+  const { clinic, doctor } = await getSessionContext();
+
   const [prescription] = await db
     .insert(prescriptions)
     .values({
-      clinicId: input.clinicId,
-      doctorId: input.doctorId,
+      clinicId: clinic.id,
+      doctorId: doctor.id,
       patientId: input.patientId,
       appointmentId: input.appointmentId,
       diagnosis: input.diagnosis,
@@ -59,10 +60,33 @@ export async function createPrescription(input: CreatePrescriptionInput) {
   return prescription;
 }
 
-export async function getPrescriptions(clinicId: string) {
+export async function getPrescriptions() {
+  const { clinic } = await getSessionContext();
+
   return db
+    .select({
+      id: prescriptions.id,
+      diagnosis: prescriptions.diagnosis,
+      createdAt: prescriptions.createdAt,
+      patientName: patients.fullName,
+      patientPhone: patients.phone,
+    })
+    .from(prescriptions)
+    .innerJoin(patients, eq(prescriptions.patientId, patients.id))
+    .where(eq(prescriptions.clinicId, clinic.id))
+    .orderBy(desc(prescriptions.createdAt));
+}
+
+export async function getPrescriptionWithItems(prescriptionId: string) {
+  const [prescription] = await db
     .select()
     .from(prescriptions)
-    .where(eq(prescriptions.clinicId, clinicId))
-    .orderBy(desc(prescriptions.createdAt));
+    .where(eq(prescriptions.id, prescriptionId));
+
+  const items = await db
+    .select()
+    .from(prescriptionItems)
+    .where(eq(prescriptionItems.prescriptionId, prescriptionId));
+
+  return { prescription, items };
 }

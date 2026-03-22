@@ -23,11 +23,7 @@ const BLOOD_GROUP_OPTIONS = [
   { value: "O-", label: "O-" },
 ];
 
-interface PatientFormProps {
-  clinicId: string;
-}
-
-export function PatientForm({ clinicId }: PatientFormProps) {
+export function PatientForm() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -41,7 +37,6 @@ export function PatientForm({ clinicId }: PatientFormProps) {
     const phone = (form.get("phone") as string).trim();
     const gender = form.get("gender") as string;
 
-    // Validate required fields
     const newErrors: Record<string, string> = {};
     if (!fullName) newErrors.fullName = "Name is required";
     if (!phone) newErrors.phone = "Phone number is required";
@@ -53,7 +48,6 @@ export function PatientForm({ clinicId }: PatientFormProps) {
     }
 
     const input: CreatePatientInput = {
-      clinicId,
       fullName,
       phone,
       gender: gender as "male" | "female" | "other",
@@ -94,7 +88,6 @@ export function PatientForm({ clinicId }: PatientFormProps) {
             </div>
           )}
 
-          {/* Basic Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input name="fullName" label="Full Name" placeholder="Patient's full name" required error={errors.fullName} />
             <Input name="phone" label="Phone Number" placeholder="9876543210" type="tel" required error={errors.phone} />
@@ -102,20 +95,17 @@ export function PatientForm({ clinicId }: PatientFormProps) {
             <Input name="email" label="Email" placeholder="patient@example.com" type="email" />
           </div>
 
-          {/* Age & DOB */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input name="dateOfBirth" label="Date of Birth" type="date" />
             <Input name="age" label="Age" type="number" placeholder="e.g. 45" min={0} max={150} />
             <Select name="bloodGroup" label="Blood Group" options={BLOOD_GROUP_OPTIONS} defaultValue="" />
           </div>
 
-          {/* Contact */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input name="emergencyContact" label="Emergency Contact" placeholder="Phone number" type="tel" />
             <Input name="address" label="Address" placeholder="Street, city" />
           </div>
 
-          {/* Medical */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Textarea name="medicalHistory" label="Medical History" placeholder="Known conditions, surgeries..." rows={3} />
             <Textarea name="allergies" label="Allergies" placeholder="Drug or food allergies..." rows={3} />
@@ -123,7 +113,6 @@ export function PatientForm({ clinicId }: PatientFormProps) {
 
           <Textarea name="notes" label="Notes" placeholder="Any additional notes..." rows={2} />
 
-          {/* Actions */}
           <div className="flex justify-end gap-3 pt-2 border-t border-[var(--color-border-subtle)]">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

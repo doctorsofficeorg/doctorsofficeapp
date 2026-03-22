@@ -17,9 +17,6 @@ const FREQUENCY_OPTIONS = [
 ];
 
 interface PrescriptionFormProps {
-  clinicId: string;
-  doctorId: string;
-  // These would typically come from context (e.g. selected appointment)
   patients: { id: string; name: string }[];
   appointments: { id: string; patientId: string; label: string }[];
 }
@@ -31,7 +28,7 @@ const emptyItem: PrescriptionItemInput = {
   duration: "",
 };
 
-export function PrescriptionForm({ clinicId, doctorId, patients, appointments }: PrescriptionFormProps) {
+export function PrescriptionForm({ patients, appointments }: PrescriptionFormProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -75,8 +72,6 @@ export function PrescriptionForm({ clinicId, doctorId, patients, appointments }:
     setLoading(true);
     try {
       await createPrescription({
-        clinicId,
-        doctorId,
         patientId,
         appointmentId,
         diagnosis,
@@ -109,30 +104,13 @@ export function PrescriptionForm({ clinicId, doctorId, patients, appointments }:
             </div>
           )}
 
-          {/* Patient & Appointment */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select
-              name="patientId"
-              label="Patient"
-              placeholder="Select patient"
-              options={patients.map((p) => ({ value: p.id, label: p.name }))}
-              defaultValue=""
-              error={errors.patientId}
-            />
-            <Select
-              name="appointmentId"
-              label="Appointment"
-              placeholder="Select appointment"
-              options={appointments.map((a) => ({ value: a.id, label: a.label }))}
-              defaultValue=""
-              error={errors.appointmentId}
-            />
+            <Select name="patientId" label="Patient" placeholder="Select patient" options={patients.map((p) => ({ value: p.id, label: p.name }))} defaultValue="" error={errors.patientId} />
+            <Select name="appointmentId" label="Appointment" placeholder="Select appointment" options={appointments.map((a) => ({ value: a.id, label: a.label }))} defaultValue="" error={errors.appointmentId} />
           </div>
 
-          {/* Diagnosis */}
           <Textarea name="diagnosis" label="Diagnosis" placeholder="Primary diagnosis..." required error={errors.diagnosis} rows={2} />
 
-          {/* Medicine Items */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-[var(--color-text-primary)]">Medicines</label>
@@ -142,46 +120,21 @@ export function PrescriptionForm({ clinicId, doctorId, patients, appointments }:
               </Button>
             </div>
 
-            {errors.items && (
-              <p className="text-xs text-[var(--color-rose-600)]">{errors.items}</p>
-            )}
+            {errors.items && <p className="text-xs text-[var(--color-rose-600)]">{errors.items}</p>}
 
             {items.map((item, index) => (
               <div key={index} className="grid grid-cols-[1fr_100px_140px_80px_32px] gap-2 items-end">
-                <Input
-                  placeholder="Medicine name"
-                  value={item.medicineName}
-                  onChange={(e) => updateItem(index, "medicineName", e.target.value)}
-                />
-                <Input
-                  placeholder="Dosage"
-                  value={item.dosage}
-                  onChange={(e) => updateItem(index, "dosage", e.target.value)}
-                />
-                <Select
-                  options={FREQUENCY_OPTIONS}
-                  value={item.frequency}
-                  onChange={(e) => updateItem(index, "frequency", e.target.value)}
-                />
-                <Input
-                  placeholder="Duration"
-                  value={item.duration}
-                  onChange={(e) => updateItem(index, "duration", e.target.value)}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => removeItem(index)}
-                  disabled={items.length === 1}
-                >
+                <Input placeholder="Medicine name" value={item.medicineName} onChange={(e) => updateItem(index, "medicineName", e.target.value)} />
+                <Input placeholder="Dosage" value={item.dosage} onChange={(e) => updateItem(index, "dosage", e.target.value)} />
+                <Select options={FREQUENCY_OPTIONS} value={item.frequency} onChange={(e) => updateItem(index, "frequency", e.target.value)} />
+                <Input placeholder="Duration" value={item.duration} onChange={(e) => updateItem(index, "duration", e.target.value)} />
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => removeItem(index)} disabled={items.length === 1}>
                   <Trash2 className="h-4 w-4 text-[var(--color-rose-500)]" />
                 </Button>
               </div>
             ))}
           </div>
 
-          {/* Advice & Follow-up */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Textarea name="advice" label="Advice" placeholder="Dietary advice, lifestyle..." rows={2} />
             <div className="space-y-4">
@@ -190,14 +143,9 @@ export function PrescriptionForm({ clinicId, doctorId, patients, appointments }:
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end gap-3 pt-2 border-t border-[var(--color-border-subtle)]">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" loading={loading}>
-              Create Prescription
-            </Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" variant="primary" loading={loading}>Create Prescription</Button>
           </div>
         </form>
       </Modal>

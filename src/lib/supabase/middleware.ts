@@ -41,6 +41,10 @@ export async function updateSession(request: NextRequest) {
   );
 
   if (!user && !isPublicPath) {
+    // In development, skip auth redirect so pages can be tested
+    if (process.env.NODE_ENV === "development") {
+      return supabaseResponse;
+    }
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

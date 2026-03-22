@@ -2,11 +2,11 @@
 
 import { db } from "@/db";
 import { patients } from "@/db/schema";
-import { eq, and, ilike, desc } from "drizzle-orm";
+import { eq, and, ilike, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getSessionContext } from "@/lib/auth/session";
 
 export interface CreatePatientInput {
-  clinicId: string;
   fullName: string;
   phone: string;
   email?: string;
@@ -31,12 +31,13 @@ function generatePatientUid(): string {
 }
 
 export async function createPatient(input: CreatePatientInput) {
+  const { clinic } = await getSessionContext();
   const patientUid = generatePatientUid();
 
   const [patient] = await db
     .insert(patients)
     .values({
-      clinicId: input.clinicId,
+      clinicId: clinic.id,
       patientUid,
       fullName: input.fullName,
       phone: input.phone,
@@ -57,13 +58,12 @@ export async function createPatient(input: CreatePatientInput) {
   return patient;
 }
 
-export async function getPatients(clinicId: string, search?: string) {
-  const conditions = [eq(patients.clinicId, clinicId)];
+export async function getPatients(search?: string) {
+  const { clinic } = await getSessionContext();
+  const conditions = [eq(patients.clinicId, clinic.id)];
 
   if (search) {
-    conditions.push(
-      ilike(patients.fullName, `%${search}%`)
-    );
+    conditions.push(ilike(patients.fullName, `%${search}%`));
   }
 
   return db
@@ -71,4 +71,13 @@ export async function getPatients(clinicId: string, search?: string) {
     .from(patients)
     .where(and(...conditions))
     .orderBy(desc(patients.createdAt));
+}
+
+export async function getPatientsList() {
+  const { clinic } = await getSessionContext();
+  return db
+    .select({ id: patients.id, name: patients.fullName })
+    .from(patients)
+    .where(eq(patients.clinicId, clinic.id))
+    .orderBy(patients.fullName);
 }

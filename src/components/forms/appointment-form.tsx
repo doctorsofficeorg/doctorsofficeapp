@@ -1,17 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input, Select, Textarea, Modal } from "@/components/ui";
+import { Button, Select, Textarea, Modal } from "@/components/ui";
 import { createAppointment } from "@/lib/actions/appointments";
 import { Plus } from "lucide-react";
 
 interface AppointmentFormProps {
-  clinicId: string;
-  doctorId: string;
   patients: { id: string; name: string }[];
 }
 
-export function AppointmentForm({ clinicId, doctorId, patients }: AppointmentFormProps) {
+export function AppointmentForm({ patients }: AppointmentFormProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,15 +30,10 @@ export function AppointmentForm({ clinicId, doctorId, patients }: AppointmentFor
       return;
     }
 
-    const today = new Date().toISOString().split("T")[0];
-
     setLoading(true);
     try {
       await createAppointment({
-        clinicId,
-        doctorId,
         patientId,
-        appointmentDate: today,
         chiefComplaint: chiefComplaint || undefined,
       });
       setOpen(false);
