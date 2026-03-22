@@ -2,14 +2,15 @@ import { Header } from "@/components/layout";
 import { Card, CardTitle, Button, Badge } from "@/components/ui";
 import { Download, IndianRupee, TrendingUp, Receipt } from "lucide-react";
 import { InvoiceForm } from "@/components/forms/invoice-form";
+import { DemoInvoiceActions } from "@/components/actions/demo-invoice-actions";
 import { formatCurrency } from "@/lib/utils";
 
 const invoices = [
-  { id: "INV-0032", patient: "Rajesh Kumar", amount: 800, gst: 144, total: 944, mode: "UPI", status: "paid", date: "22 Mar 2026" },
-  { id: "INV-0031", patient: "Priya Sharma", amount: 500, gst: 90, total: 590, mode: "Cash", status: "paid", date: "22 Mar 2026" },
-  { id: "INV-0030", patient: "Amit Patel", amount: 1200, gst: 216, total: 1416, mode: "Card", status: "pending", date: "22 Mar 2026" },
-  { id: "INV-0029", patient: "Sunita Devi", amount: 600, gst: 108, total: 708, mode: "UPI", status: "paid", date: "21 Mar 2026" },
-  { id: "INV-0028", patient: "Mohammed Ali", amount: 500, gst: 90, total: 590, mode: "Cash", status: "paid", date: "20 Mar 2026" },
+  { id: "INV-0032", patient: "Rajesh Kumar", phone: "9876543210", amount: 800, gst: 144, total: 944, mode: "UPI", status: "paid", date: "22 Mar 2026", items: [{ description: "Consultation", quantity: 1, unitPrice: 800, amount: 800 }] },
+  { id: "INV-0031", patient: "Priya Sharma", phone: "9123456789", amount: 500, gst: 90, total: 590, mode: "Cash", status: "paid", date: "22 Mar 2026", items: [{ description: "Consultation", quantity: 1, unitPrice: 500, amount: 500 }] },
+  { id: "INV-0030", patient: "Amit Patel", phone: "9988776655", amount: 1200, gst: 216, total: 1416, mode: "Card", status: "pending", date: "22 Mar 2026", items: [{ description: "Consultation", quantity: 1, unitPrice: 500, amount: 500 }, { description: "X-Ray Lumbar Spine", quantity: 1, unitPrice: 700, amount: 700 }] },
+  { id: "INV-0029", patient: "Sunita Devi", phone: "9112233445", amount: 600, gst: 108, total: 708, mode: "UPI", status: "paid", date: "21 Mar 2026", items: [{ description: "Follow-up Consultation", quantity: 1, unitPrice: 400, amount: 400 }, { description: "Blood Sugar Test", quantity: 1, unitPrice: 200, amount: 200 }] },
+  { id: "INV-0028", patient: "Mohammed Ali", phone: "9556677889", amount: 500, gst: 90, total: 590, mode: "Cash", status: "paid", date: "20 Mar 2026", items: [{ description: "Consultation", quantity: 1, unitPrice: 500, amount: 500 }] },
 ];
 
 export default function BillingPage() {
@@ -92,6 +93,7 @@ export default function BillingPage() {
                 <th className="px-6 py-3 text-center text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Mode</th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
@@ -111,6 +113,21 @@ export default function BillingPage() {
                     </Badge>
                   </td>
                   <td className="px-6 py-3.5 text-sm text-[var(--color-text-muted)]">{inv.date}</td>
+                  <td className="px-6 py-3.5 text-right">
+                    <DemoInvoiceActions
+                      patientName={inv.patient}
+                      patientPhone={inv.phone}
+                      invoiceNumber={inv.id}
+                      total={inv.total}
+                      paymentStatus={inv.status}
+                      items={inv.items}
+                      gstPercent={18}
+                      gstAmount={inv.gst}
+                      subtotal={inv.amount}
+                      discount={0}
+                      paymentMode={inv.mode.toLowerCase()}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,14 +1,35 @@
 import { Header } from "@/components/layout";
-import { Card, CardTitle, Button, Badge, Avatar } from "@/components/ui";
-import { Download, Send, Eye, FileText } from "lucide-react";
+import { Card, CardTitle, Badge } from "@/components/ui";
+import { Eye, FileText } from "lucide-react";
+import { Button } from "@/components/ui";
 import { PrescriptionForm } from "@/components/forms/prescription-form";
+import { DemoPrescriptionActions } from "@/components/actions/demo-prescription-actions";
 
 const prescriptions = [
-  { id: "RX-001", patient: "Rajesh Kumar", diagnosis: "Upper respiratory tract infection", medicines: 3, date: "22 Mar 2026", status: "sent" },
-  { id: "RX-002", patient: "Priya Sharma", diagnosis: "Contact dermatitis", medicines: 2, date: "22 Mar 2026", status: "sent" },
-  { id: "RX-003", patient: "Amit Patel", diagnosis: "Lumbar spondylosis", medicines: 4, date: "21 Mar 2026", status: "draft" },
-  { id: "RX-004", patient: "Sunita Devi", diagnosis: "Type 2 Diabetes — follow up", medicines: 3, date: "20 Mar 2026", status: "sent" },
-  { id: "RX-005", patient: "Mohammed Ali", diagnosis: "Tension headache", medicines: 2, date: "19 Mar 2026", status: "sent" },
+  { id: "RX-001", patient: "Rajesh Kumar", phone: "9876543210", diagnosis: "Upper respiratory tract infection", medicines: [
+    { name: "Amoxicillin 500mg", dosage: "1 tab", frequency: "TDS", duration: "5 days" },
+    { name: "Paracetamol 650mg", dosage: "1 tab", frequency: "SOS", duration: "3 days" },
+    { name: "Cetirizine 10mg", dosage: "1 tab", frequency: "HS", duration: "5 days" },
+  ], date: "22 Mar 2026", status: "sent" },
+  { id: "RX-002", patient: "Priya Sharma", phone: "9123456789", diagnosis: "Contact dermatitis", medicines: [
+    { name: "Betamethasone cream", dosage: "Apply thin layer", frequency: "BD", duration: "7 days" },
+    { name: "Hydroxyzine 25mg", dosage: "1 tab", frequency: "HS", duration: "5 days" },
+  ], date: "22 Mar 2026", status: "sent" },
+  { id: "RX-003", patient: "Amit Patel", phone: "9988776655", diagnosis: "Lumbar spondylosis", medicines: [
+    { name: "Diclofenac 50mg", dosage: "1 tab", frequency: "BD", duration: "7 days" },
+    { name: "Thiocolchicoside 4mg", dosage: "1 tab", frequency: "BD", duration: "5 days" },
+    { name: "Pantoprazole 40mg", dosage: "1 tab", frequency: "OD", duration: "7 days" },
+    { name: "Calcium + Vitamin D3", dosage: "1 tab", frequency: "OD", duration: "30 days" },
+  ], date: "21 Mar 2026", status: "draft" },
+  { id: "RX-004", patient: "Sunita Devi", phone: "9112233445", diagnosis: "Type 2 Diabetes — follow up", medicines: [
+    { name: "Metformin 500mg", dosage: "1 tab", frequency: "BD", duration: "30 days" },
+    { name: "Glimepiride 1mg", dosage: "1 tab", frequency: "OD", duration: "30 days" },
+    { name: "Atorvastatin 10mg", dosage: "1 tab", frequency: "HS", duration: "30 days" },
+  ], date: "20 Mar 2026", status: "sent" },
+  { id: "RX-005", patient: "Mohammed Ali", phone: "9556677889", diagnosis: "Tension headache", medicines: [
+    { name: "Naproxen 250mg", dosage: "1 tab", frequency: "BD", duration: "3 days" },
+    { name: "Amitriptyline 10mg", dosage: "1 tab", frequency: "HS", duration: "14 days" },
+  ], date: "19 Mar 2026", status: "sent" },
 ];
 
 export default function PrescriptionsPage() {
@@ -32,7 +53,6 @@ export default function PrescriptionsPage() {
       </Header>
 
       <div className="p-8 space-y-6 bg-pearl-gradient-subtle min-h-[calc(100vh-64px)]">
-        {/* Prescription List */}
         <Card padding="none">
           <div className="px-6 py-4 border-b border-[var(--color-border-subtle)] flex items-center justify-between">
             <CardTitle>Recent Prescriptions</CardTitle>
@@ -55,7 +75,7 @@ export default function PrescriptionsPage() {
                 </div>
 
                 <div className="text-sm text-[var(--color-text-muted)]">
-                  {rx.medicines} medicines
+                  {rx.medicines.length} medicines
                 </div>
 
                 <div className="text-sm text-[var(--color-text-muted)]">{rx.date}</div>
@@ -68,12 +88,12 @@ export default function PrescriptionsPage() {
                   <Button variant="ghost" size="icon-sm" title="View">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon-sm" title="Download PDF">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon-sm" title="Send via WhatsApp">
-                    <Send className="h-4 w-4 text-[var(--color-emerald-600)]" />
-                  </Button>
+                  <DemoPrescriptionActions
+                    patientName={rx.patient}
+                    patientPhone={rx.phone}
+                    diagnosis={rx.diagnosis}
+                    medicines={rx.medicines}
+                  />
                 </div>
               </div>
             ))}
