@@ -33,12 +33,15 @@
 - [x] SQL migration (supabase/migrations/0001_initial_schema.sql) with RLS policies & realtime
 - [x] DB connection utility (src/db/index.ts) with postgres-js driver
 - [x] drizzle.config.ts for migration generation
+- [x] Functional forms: Patient, Prescription (dynamic medicines), Invoice (live totals), Walk-in
+- [x] UI: Select, Textarea, Modal components
+- [x] Server actions for all entities with auto-generated IDs/tokens/invoice numbers
+- [x] PDF generation (jsPDF) — prescription and invoice with clinic branding
+- [x] WhatsApp share via wa.me deep links with formatted messages
+- [x] Middleware skip for dev mode (no Supabase env vars needed)
 
 ### In Progress
-- [ ] Functional forms (patient create, prescription create, invoice create)
-- [ ] PDF generation for prescriptions & invoices
-- [ ] WhatsApp share via wa.me deep links
-- [ ] Real-time queue updates via Supabase Realtime
+- [ ] Real-time queue updates via Supabase Realtime (needs live Supabase)
 
 ### Not Started
 - [ ] Register page
