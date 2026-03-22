@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -59,7 +60,9 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-[var(--color-background)] antialiased">
-        {children}
+        <PostHogProvider>
+          {children}
+        </PostHogProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `

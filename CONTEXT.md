@@ -41,14 +41,22 @@
 - [x] Middleware skip for dev mode (no Supabase env vars needed)
 
 ### In Progress
-- [ ] Real-time queue updates via Supabase Realtime (needs live Supabase)
+- [ ] Deployment (Cloudflare Pages)
 
 ### Not Started
-- [ ] Register page
-- [ ] PWA manifest & service worker
-- [ ] Deployment (Cloudflare Pages)
-- [ ] PostHog analytics integration
-- [ ] Sentry error tracking
+- [ ] PWA icons (192x192, 512x512) — currently placeholders
+
+### Recently Completed
+- [x] Supabase connected — all pages fetch live data from DB
+- [x] Register page with email/password + Google OAuth
+- [x] Login page wired to Supabase auth (email + Google)
+- [x] Dashboard with live stats (patients, queue, prescriptions, revenue)
+- [x] PWA manifest & service worker
+- [x] Session context (getSessionContext) for clinic/doctor resolution
+- [x] Queue status transitions (Waiting → In Consultation → Done)
+- [x] Seeded Pearl Clinic, Dr. Sharma, 6 patients
+- [x] PostHog analytics (posthog-js) — pageview tracking, identified_only
+- [x] Sentry error tracking (@sentry/nextjs) — client, server, edge configs
 
 ## Repository
 
