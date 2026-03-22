@@ -39,6 +39,13 @@ export const metadata: Metadata = {
     "healthcare",
     "India",
   ],
+  manifest: "/manifest.json",
+  themeColor: "#0d9488",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Doctors Office",
+  },
 };
 
 export default function RootLayout({
@@ -53,6 +60,17 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-[var(--color-background)] antialiased">
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
