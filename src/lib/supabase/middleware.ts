@@ -30,21 +30,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Handle OAuth code exchange — Supabase redirects back with ?code=
+  // If there's a ?code= param, let the page handle the exchange client-side
+  // (PKCE verifier is in browser localStorage, not accessible in middleware)
   const code = request.nextUrl.searchParams.get("code");
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      url.searchParams.delete("code");
-      // Copy cookies from supabaseResponse to the redirect
-      const redirectResponse = NextResponse.redirect(url);
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value);
-      });
-      return redirectResponse;
-    }
+    return supabaseResponse;
   }
 
   const {

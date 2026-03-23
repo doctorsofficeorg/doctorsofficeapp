@@ -9,20 +9,35 @@ import { createClient } from "@/lib/supabase/client";
 
 function OAuthCodeHandler() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const [exchanging, setExchanging] = useState(false);
 
   useEffect(() => {
     const code = searchParams.get("code");
-    if (code) {
+    if (code && !exchanging) {
+      setExchanging(true);
       const supabase = createClient();
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (!error) {
-          router.push("/dashboard");
-          router.refresh();
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        if (!error && data.session) {
+          // Full page redirect so middleware picks up the new session cookies
+          window.location.href = "/dashboard";
+        } else {
+          console.error("OAuth code exchange failed:", error?.message);
+          setExchanging(false);
         }
       });
     }
-  }, [searchParams, router]);
+  }, [searchParams, exchanging]);
+
+  if (exchanging) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-teal-600)] border-t-transparent mx-auto mb-3" />
+          <p className="text-sm text-[var(--color-text-secondary)]">Signing you in...</p>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 }
