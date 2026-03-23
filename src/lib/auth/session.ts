@@ -1,27 +1,69 @@
 import { db } from "@/db";
 import { clinics, doctors } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { createClient } from "@/lib/supabase/server";
 
 /**
- * Get the current clinic and doctor context.
- * TODO: Once auth is wired, this will use the Supabase user session
- * to look up the doctor's clinic. For now, returns the first clinic/doctor.
+ * Get the current clinic and doctor context from the authenticated user.
+ * Auto-provisions a clinic and doctor profile on first login.
  */
 export async function getSessionContext() {
-  const [doctor] = await db.select().from(doctors).limit(1);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!doctor) {
-    throw new Error("No doctor found. Run the seed script first.");
+  if (!user) {
+    throw new Error("Not authenticated");
   }
+
+  // Try to find existing doctor by Supabase user ID
+  let [doctor] = await db
+    .select()
+    .from(doctors)
+    .where(eq(doctors.userId, user.id))
+    .limit(1);
+
+  if (doctor) {
+    const [clinic] = await db
+      .select()
+      .from(clinics)
+      .where(eq(clinics.id, doctor.clinicId));
+    return { clinic: clinic!, doctor, user };
+  }
+
+  // First login — auto-provision clinic + doctor
+  const fullName =
+    user.user_metadata?.full_name || user.email?.split("@")[0] || "Doctor";
+  const email = user.email || "";
 
   const [clinic] = await db
-    .select()
-    .from(clinics)
-    .where(eq(clinics.id, doctor.clinicId));
+    .insert(clinics)
+    .values({
+      name: `${fullName}'s Clinic`,
+      address: "Update your clinic address",
+      city: "City",
+      state: "State",
+      pincode: "000000",
+      phone: "",
+      email,
+      region: "india",
+    })
+    .returning();
 
-  if (!clinic) {
-    throw new Error("No clinic found for doctor.");
-  }
+  [doctor] = await db
+    .insert(doctors)
+    .values({
+      clinicId: clinic.id,
+      userId: user.id,
+      fullName,
+      qualification: "MBBS",
+      registrationNumber: "UPDATE-REG-NO",
+      specialization: "General Medicine",
+      phone: "",
+      email,
+    })
+    .returning();
 
-  return { clinic, doctor };
+  return { clinic, doctor, user };
 }
