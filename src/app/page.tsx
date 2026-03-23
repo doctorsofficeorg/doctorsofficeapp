@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Stethoscope, ArrowRight, Shield, Zap, Globe } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen bg-pearl-mesh">
       {/* Navigation */}
@@ -15,18 +19,43 @@ export default function LandingPage() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            className="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-          >
-            Get Started Free
-          </Link>
+          {user ? (
+            <>
+              <div className="flex items-center gap-2">
+                {user.user_metadata?.avatar_url && (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt=""
+                    className="h-8 w-8 rounded-full border border-[var(--color-border)]"
+                  />
+                )}
+                <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                  {user.user_metadata?.full_name || user.email}
+                </span>
+              </div>
+              <Link
+                href="/dashboard"
+                className="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+              >
+                Go to Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+              >
+                Get Started Free
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
