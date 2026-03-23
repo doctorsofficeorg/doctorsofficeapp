@@ -40,7 +40,6 @@ export const metadata: Metadata = {
     "healthcare",
     "India",
   ],
-  manifest: "/manifest.json",
   themeColor: "#0d9488",
   appleWebApp: {
     capable: true,
@@ -63,6 +62,19 @@ export default function RootLayout({
         <PostHogProvider>
           {children}
         </PostHogProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  registrations.forEach(function(registration) {
+                    registration.unregister();
+                  });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
