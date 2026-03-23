@@ -30,12 +30,29 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // Handle OAuth code exchange — Supabase redirects back with ?code=
+  const code = request.nextUrl.searchParams.get("code");
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      url.searchParams.delete("code");
+      // Copy cookies from supabaseResponse to the redirect
+      const redirectResponse = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
+    }
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   // Redirect unauthenticated users to login (except public pages)
-  const publicPaths = ["/", "/login", "/register", "/forgot-password"];
+  const publicPaths = ["/", "/login", "/register", "/forgot-password", "/auth/callback"];
   const isPublicPath = publicPaths.some(
     (path) => request.nextUrl.pathname === path
   );
