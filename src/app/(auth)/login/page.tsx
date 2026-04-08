@@ -7,6 +7,9 @@ import { Stethoscope } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 
+const isDemoMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
 function OAuthCodeHandler() {
   const searchParams = useSearchParams();
   const [exchanging, setExchanging] = useState(false);
@@ -51,6 +54,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (isDemoMode) {
+      router.push("/dashboard");
+      return;
+    }
 
     const form = new FormData(e.currentTarget);
     const email = (form.get("email") as string).trim();
@@ -143,7 +151,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} method="post" className="space-y-5">
             <Input
               name="email"
               label="Email"

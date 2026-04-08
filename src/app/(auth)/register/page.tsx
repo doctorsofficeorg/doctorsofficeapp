@@ -2,19 +2,29 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Stethoscope } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
+
+const isDemoMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (isDemoMode) {
+      router.push("/dashboard");
+      return;
+    }
 
     const form = new FormData(e.currentTarget);
     const email = (form.get("email") as string).trim();
@@ -144,7 +154,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} method="post" className="space-y-5">
             <Input
               name="fullName"
               label="Full Name"
