@@ -5,6 +5,7 @@ import { invoices, invoiceItems, patients } from "@/db/schema";
 import { eq, sql, desc, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSessionContext } from "@/lib/auth/session";
+import { isDemoMode, demoInvoices } from "@/lib/demo-data";
 
 export interface InvoiceItemInput {
   description: string;
@@ -79,6 +80,8 @@ export async function createInvoice(input: CreateInvoiceInput) {
 }
 
 export async function getInvoices() {
+  if (isDemoMode) return demoInvoices;
+
   const { clinic } = await getSessionContext();
 
   return db

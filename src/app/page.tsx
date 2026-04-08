@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { Stethoscope, ArrowRight, Shield, Zap, Globe } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { isDemoMode } from "@/lib/demo-data";
 
-export default async function LandingPage() {
+async function getUser() {
+  if (isDemoMode) return null;
+  const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
+export default async function LandingPage() {
+  const user = await getUser();
 
   return (
     <div className="min-h-screen bg-pearl-mesh">

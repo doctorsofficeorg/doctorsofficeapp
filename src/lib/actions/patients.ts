@@ -5,6 +5,7 @@ import { patients } from "@/db/schema";
 import { eq, and, ilike, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSessionContext } from "@/lib/auth/session";
+import { isDemoMode, demoPatients, demoPatientsList } from "@/lib/demo-data";
 
 export interface CreatePatientInput {
   fullName: string;
@@ -59,6 +60,15 @@ export async function createPatient(input: CreatePatientInput) {
 }
 
 export async function getPatients(search?: string) {
+  if (isDemoMode) {
+    if (search) {
+      return demoPatients.filter((p) =>
+        p.fullName.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    return demoPatients;
+  }
+
   const { clinic } = await getSessionContext();
   const conditions = [eq(patients.clinicId, clinic.id)];
 
@@ -74,6 +84,8 @@ export async function getPatients(search?: string) {
 }
 
 export async function getPatientsList() {
+  if (isDemoMode) return demoPatientsList;
+
   const { clinic } = await getSessionContext();
   return db
     .select({ id: patients.id, name: patients.fullName })

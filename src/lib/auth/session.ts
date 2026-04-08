@@ -2,12 +2,17 @@ import { db } from "@/db";
 import { clinics, doctors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
+import { isDemoMode, demoClinic, demoDoctor } from "@/lib/demo-data";
 
 /**
  * Get the current clinic and doctor context from the authenticated user.
  * Auto-provisions a clinic and doctor profile on first login.
  */
 export async function getSessionContext() {
+  if (isDemoMode) {
+    return { clinic: demoClinic, doctor: demoDoctor, user: null };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

@@ -5,6 +5,7 @@ import { appointments, patients } from "@/db/schema";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSessionContext } from "@/lib/auth/session";
+import { isDemoMode, demoQueue } from "@/lib/demo-data";
 
 export interface CreateAppointmentInput {
   patientId: string;
@@ -67,6 +68,8 @@ export async function updateAppointmentStatus(
 }
 
 export async function getTodayQueue() {
+  if (isDemoMode) return demoQueue;
+
   const { clinic } = await getSessionContext();
   const today = new Date().toISOString().split("T")[0];
 

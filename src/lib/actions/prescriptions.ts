@@ -5,6 +5,7 @@ import { prescriptions, prescriptionItems, patients } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSessionContext } from "@/lib/auth/session";
+import { isDemoMode, demoPrescriptions } from "@/lib/demo-data";
 
 export interface PrescriptionItemInput {
   medicineName: string;
@@ -61,6 +62,8 @@ export async function createPrescription(input: CreatePrescriptionInput) {
 }
 
 export async function getPrescriptions() {
+  if (isDemoMode) return demoPrescriptions;
+
   const { clinic } = await getSessionContext();
 
   return db
