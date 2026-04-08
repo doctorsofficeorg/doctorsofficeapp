@@ -1,0 +1,235 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="page-title mb-1">Team Management</h4>
+      <p class="text-muted mb-0">Manage clinic staff, roles, and permissions</p>
+    </div>
+    <p-button label="Invite Member" icon="pi pi-user-plus" (onClick)="openInviteDialog()" />
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="summary-card summary-doctors">
+        <div class="summary-count">{{ doctorCount() }}</div>
+        <div class="summary-label">Doctors</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="summary-card summary-nurses">
+        <div class="summary-count">{{ nurseCount() }}</div>
+        <div class="summary-label">Nurses</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="summary-card summary-lab">
+        <div class="summary-count">{{ labTechCount() }}</div>
+        <div class="summary-label">Lab Techs</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 3h6v6l3 9H6l3-9z"/>
+            <path d="M12 3v6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="summary-card summary-frontdesk">
+        <div class="summary-count">{{ frontDeskCount() }}</div>
+        <div class="summary-label">Front Desk</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members Table -->
+  <div class="table-card">
+    <p-table [value]="members()" [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm p-datatable-striped" [paginator]="true" [rows]="10">
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Specialization</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-member>
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="member-avatar" [class]="'avatar-' + member.role">
+                {{ member.name.split(' ').map(getFirstChar).join('').slice(0, 2) }}
+              </div>
+              <div>
+                <div class="fw-semibold">{{ member.name }}</div>
+                @if (member.qualification) {
+                  <div class="text-muted small">{{ member.qualification }}</div>
+                }
+              </div>
+            </div>
+          </td>
+          <td>+91 {{ member.phone }}</td>
+          <td>
+            <p-tag [value]="getRoleLabel(member.role)" [severity]="getRoleSeverity(member.role)" />
+          </td>
+          <td>
+            @if (member.specialization) {
+              {{ member.specialization }}
+            } @else {
+              <span class="text-muted">--</span>
+            }
+          </td>
+          <td>{{ formatDate(member.joinedDate) }}</td>
+          <td>
+            <p-tag [value]="getStatusLabel(member.status)" [severity]="getStatusSeverity(member.status)" />
+          </td>
+          <td>
+            <div class="d-flex gap-1">
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" size="small" (onClick)="openEditDialog(member)" pTooltip="Edit" />
+              @if (member.role !== 'owner') {
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="removeMember(member)" pTooltip="Remove" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">No team members found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Invite Member Dialog -->
+  <p-dialog header="Invite Member" [(visible)]="showInviteDialog" [modal]="true" [style]="{ width: '520px' }" [draggable]="false">
+    <div class="pt-2">
+      <div class="mb-3">
+        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <div class="phone-input-wrapper">
+          <span class="phone-prefix">+91</span>
+          <input type="tel" pInputText class="w-100 phone-input" [(ngModel)]="inviteForm.phone" placeholder="9876543210" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Role <span class="text-danger">*</span></label>
+        <p-select [options]="roleOptions" [(ngModel)]="inviteForm.role" placeholder="Select role" styleClass="w-100" />
+      </div>
+
+      @if (inviteForm.role === 'doctor') {
+        <div class="doctor-fields">
+          <div class="mb-3">
+            <label class="form-label">Qualification</label>
+            <input type="text" pInputText class="w-100" [(ngModel)]="inviteForm.qualification" placeholder="e.g. MBBS, MD" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Registration Number</label>
+            <input type="text" pInputText class="w-100" [(ngModel)]="inviteForm.registrationNo" placeholder="e.g. KMC-2020-XXXXX" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Specialization</label>
+            <input type="text" pInputText class="w-100" [(ngModel)]="inviteForm.specialization" placeholder="e.g. Cardiologist" />
+          </div>
+        </div>
+      }
+    </div>
+    <ng-template #footer>
+      <div class="d-flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeInviteDialog()" />
+        <p-button label="Send Invite" icon="pi pi-send" (onClick)="sendInvite()" [disabled]="!inviteForm.phone || !inviteForm.role" />
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Edit Member Dialog -->
+  <p-dialog header="Edit Member" [(visible)]="showEditDialog" [modal]="true" [style]="{ width: '520px' }" [draggable]="false">
+    @if (editingMember(); as member) {
+      <div class="pt-2">
+        <div class="edit-member-info mb-3">
+          <div class="fw-semibold">{{ member.name }}</div>
+          <div class="text-muted small">+91 {{ member.phone }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Role</label>
+          <p-select [options]="roleOptions" [(ngModel)]="editForm.role" placeholder="Select role" styleClass="w-100" [disabled]="member.role === 'owner'" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold mb-2">Permissions</label>
+          <div class="permissions-grid">
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.viewPatients" />
+                <span>View Patients</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.editPatients" />
+                <span>Edit Patients</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.viewBilling" />
+                <span>View Billing</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.editBilling" />
+                <span>Edit Billing</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.viewPrescriptions" />
+                <span>View Prescriptions</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.editPrescriptions" />
+                <span>Edit Prescriptions</span>
+              </label>
+            </div>
+            <div class="permission-item">
+              <label class="permission-label">
+                <input type="checkbox" [(ngModel)]="editForm.permissions.manageTeam" />
+                <span>Manage Team</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    <ng-template #footer>
+      <div class="d-flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeEditDialog()" />
+        <p-button label="Save Changes" icon="pi pi-check" (onClick)="saveEdit()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
