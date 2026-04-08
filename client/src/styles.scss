@@ -1,0 +1,24 @@
+@use "bootstrap/scss/bootstrap";
+// PrimeNG theme will be configured in app.config.ts
+@use "primeicons/primeicons.css";
+
+// Custom global styles for Doctors Office
+:root {
+  --do-primary: #0d9488;
+  --do-primary-dark: #0f766e;
+  --do-primary-light: #14b8a6;
+  --do-bg: #f8fafb;
+  --do-surface: #ffffff;
+  --do-text: #1e293b;
+  --do-text-secondary: #64748b;
+  --do-text-muted: #94a3b8;
+  --do-border: #e2e8f0;
+  --do-border-subtle: #f1f5f9;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--do-bg);
+  color: var(--do-text);
+  -webkit-font-smoothing: antialiased;
+}

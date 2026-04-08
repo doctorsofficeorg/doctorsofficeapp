@@ -1,0 +1,203 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="page-title mb-1">Billing</h4>
+      <p class="text-muted mb-0">Invoices and payments</p>
+    </div>
+    <p-button label="New Invoice" icon="pi pi-plus" (onClick)="openNewInvoice()" />
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="summary-card summary-revenue">
+        <div class="summary-count">{{ todayRevenue() }}</div>
+        <div class="summary-label">Today's Revenue</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card summary-invoices">
+        <div class="summary-count">{{ invoicesToday() }}</div>
+        <div class="summary-label">Invoices Today</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card summary-pending">
+        <div class="summary-count">{{ pendingPayments() }}</div>
+        <div class="summary-label">Pending Payments</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoices Table -->
+  <div class="table-card">
+    <p-table [value]="invoices()" [tableStyle]="{ 'min-width': '55rem' }" styleClass="p-datatable-sm p-datatable-striped" [paginator]="true" [rows]="10">
+      <ng-template #header>
+        <tr>
+          <th>Invoice #</th>
+          <th>Patient</th>
+          <th>Total</th>
+          <th>Payment Mode</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-inv>
+        <tr>
+          <td><span class="fw-semibold">{{ inv.invoiceNo }}</span></td>
+          <td>
+            <div>
+              <div class="fw-semibold">{{ inv.patientName }}</div>
+              <div class="text-muted small">{{ inv.patientUid }}</div>
+            </div>
+          </td>
+          <td class="fw-semibold">{{ fc(inv.grandTotal) }}</td>
+          <td>
+            <p-tag [value]="formatPaymentMode(inv.paymentMode)" [severity]="getPaymentModeSeverity(inv.paymentMode)" />
+          </td>
+          <td>
+            <p-tag [value]="formatPaymentStatus(inv.paymentStatus)" [severity]="getPaymentStatusSeverity(inv.paymentStatus)" />
+          </td>
+          <td>{{ formatDate(inv.date) }}</td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6" class="text-center py-4 text-muted">No invoices found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- New Invoice Dialog -->
+  <p-dialog header="New Invoice" [(visible)]="showDialog" [modal]="true" [style]="{ width: '850px' }" [draggable]="false">
+    <div class="pt-2">
+      <!-- Patient Selection -->
+      <div class="mb-3">
+        <label class="form-label">Select Patient <span class="text-danger">*</span></label>
+        <p-select
+          [options]="patientOptions()"
+          [(ngModel)]="form.patientId"
+          placeholder="Search patient"
+          [filter]="true"
+          filterBy="label"
+          styleClass="w-100"
+        />
+      </div>
+
+      <!-- Items Table -->
+      <div class="mb-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <label class="form-label mb-0">Invoice Items</label>
+          <p-button label="Add Item" icon="pi pi-plus" size="small" [outlined]="true" (onClick)="addItem()" />
+        </div>
+        <div class="items-table">
+          <div class="items-header">
+            <span class="item-col item-desc">Description</span>
+            <span class="item-col item-qty">Qty</span>
+            <span class="item-col item-price">Unit Price (₹)</span>
+            <span class="item-col item-amount">Amount (₹)</span>
+            <span class="item-col item-action"></span>
+          </div>
+          @for (item of items(); track $index; let i = $index) {
+            <div class="items-row">
+              <div class="item-col item-desc">
+                <input type="text" pInputText class="w-100" [(ngModel)]="item.description" placeholder="Service/Item description" />
+              </div>
+              <div class="item-col item-qty">
+                <input type="number" pInputText class="w-100" [(ngModel)]="item.quantity" min="1" (ngModelChange)="updateItemAmount(item)" />
+              </div>
+              <div class="item-col item-price">
+                <input type="number" pInputText class="w-100" [(ngModel)]="item.unitPrice" min="0" (ngModelChange)="updateItemAmount(item)" />
+              </div>
+              <div class="item-col item-amount">
+                <span class="amount-display">{{ fc(item.amount) }}</span>
+              </div>
+              <div class="item-col item-action">
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="removeItem(i)" />
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <label class="form-label">GST %</label>
+          <input type="number" pInputText class="w-100" [(ngModel)]="form.gstPercent" min="0" max="28" placeholder="0" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Discount (₹)</label>
+          <input type="number" pInputText class="w-100" [(ngModel)]="form.discount" min="0" placeholder="0" />
+        </div>
+        <div class="col-md-6">
+          <div class="totals-box">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>{{ fc(subtotal()) }}</span>
+            </div>
+            <div class="total-row">
+              <span>GST ({{ form.gstPercent }}%)</span>
+              <span>{{ fc(gstAmount()) }}</span>
+            </div>
+            @if (form.discount > 0) {
+              <div class="total-row text-danger">
+                <span>Discount</span>
+                <span>- {{ fc(form.discount) }}</span>
+              </div>
+            }
+            <div class="total-row total-grand">
+              <span>Total</span>
+              <span>{{ fc(total()) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Payment Mode</label>
+          <p-select [options]="paymentModeOptions" [(ngModel)]="form.paymentMode" placeholder="Select mode" styleClass="w-100" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Payment Status</label>
+          <p-select [options]="paymentStatusOptions" [(ngModel)]="form.paymentStatus" placeholder="Select status" styleClass="w-100" />
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mb-3">
+        <label class="form-label">Notes</label>
+        <textarea pInputText class="w-100" rows="2" [(ngModel)]="form.notes" placeholder="Additional notes"></textarea>
+      </div>
+    </div>
+    <ng-template #footer>
+      <div class="d-flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeDialog()" />
+        <p-button label="Save Invoice" icon="pi pi-check" (onClick)="saveInvoice()" [disabled]="!form.patientId" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

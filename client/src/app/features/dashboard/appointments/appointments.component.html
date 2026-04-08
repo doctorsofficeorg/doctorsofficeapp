@@ -1,0 +1,120 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="page-title mb-1">Appointments</h4>
+      <p class="text-muted mb-0">Today's patient queue</p>
+    </div>
+    <p-button label="Add Walk-in" icon="pi pi-plus" (onClick)="openWalkInDialog()" />
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="summary-card summary-waiting">
+        <div class="summary-count">{{ waitingCount() }}</div>
+        <div class="summary-label">Waiting</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card summary-consultation">
+        <div class="summary-count">{{ inConsultationCount() }}</div>
+        <div class="summary-label">In Consultation</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card summary-completed">
+        <div class="summary-count">{{ completedCount() }}</div>
+        <div class="summary-label">Completed</div>
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Queue List -->
+  <div class="queue-list">
+    @for (item of queue(); track item._id) {
+      <div class="queue-item" [class.queue-completed]="item.status === 'completed'" [class.queue-active]="item.status === 'in-progress'">
+        <div class="queue-token">
+          <span class="token-number">{{ item.tokenNo }}</span>
+        </div>
+        <div class="queue-patient">
+          <div class="avatar-initials">{{ getInitials(item.patientName) }}</div>
+          <div class="patient-info">
+            <span class="patient-name">{{ item.patientName }}</span>
+            <span class="patient-uid">{{ item.patientUid }}</span>
+          </div>
+        </div>
+        <div class="queue-type">
+          <span class="type-label">{{ item.type }}</span>
+        </div>
+        <div class="queue-time">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>{{ item.scheduledTime }}</span>
+        </div>
+        <div class="queue-status">
+          <p-tag [value]="getStatusLabel(item.status)" [severity]="getStatusSeverity(item.status)" />
+        </div>
+        <div class="queue-action">
+          @if (getActionLabel(item.status)) {
+            <p-button
+              [label]="getActionLabel(item.status)"
+              [severity]="getActionSeverity(item.status)"
+              size="small"
+              [outlined]="true"
+              (onClick)="onAction(item)"
+            />
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center py-5 text-muted">
+        <p>No appointments in the queue today.</p>
+      </div>
+    }
+  </div>
+
+  <!-- Walk-in Dialog -->
+  <p-dialog header="Add Walk-in Patient" [(visible)]="showWalkInDialog" [modal]="true" [style]="{ width: '480px' }" [draggable]="false">
+    <div class="pt-2">
+      <div class="mb-3">
+        <label class="form-label">Select Patient <span class="text-danger">*</span></label>
+        <p-select
+          [options]="patientOptions()"
+          [(ngModel)]="walkInForm.patientId"
+          placeholder="Search and select patient"
+          [filter]="true"
+          filterBy="label"
+          styleClass="w-100"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Chief Complaint</label>
+        <input type="text" pInputText class="w-100" [(ngModel)]="walkInForm.complaint" placeholder="Describe the complaint" />
+      </div>
+    </div>
+    <ng-template #footer>
+      <div class="d-flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeWalkInDialog()" />
+        <p-button label="Add to Queue" icon="pi pi-plus" (onClick)="saveWalkIn()" [disabled]="!walkInForm.patientId" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -1,43 +1,17 @@
 {
-  "name": "doctors-office",
+  "name": "doctorsofficeapp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Doctors Office — Clinic Management Platform for Indian Doctors",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@sentry/nextjs": "^10.45.0",
-    "@supabase/ssr": "^0.9.0",
-    "@supabase/supabase-js": "^2.99.3",
-    "@tailwindcss/postcss": "^4.2.2",
-    "@types/node": "^25.5.0",
-    "@types/react": "^19.2.14",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.45.1",
-    "jspdf": "^4.2.1",
-    "lucide-react": "^0.577.0",
-    "next": "^16.2.1",
-    "postcss": "^8.5.8",
-    "postgres": "^3.4.8",
-    "posthog-js": "^1.363.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^5.9.3"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:yjs\"",
+    "dev:client": "cd client && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:yjs": "cd yjs-server && npm run dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "install:all": "cd client && npm install && cd ../server && npm install && cd ../yjs-server && npm install"
   },
   "devDependencies": {
-    "@types/react-dom": "^19.2.3",
-    "drizzle-kit": "^0.31.10",
-    "eslint-config-next": "^16.2.1"
+    "concurrently": "^9.2.1"
   }
 }

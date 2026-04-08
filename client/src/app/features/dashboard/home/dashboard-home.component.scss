@@ -1,0 +1,178 @@
+:host {
+  display: block;
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+:host ::ng-deep {
+  .stat-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .stat-patients .stat-icon {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+
+  .stat-queue .stat-icon {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .stat-prescriptions .stat-icon {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  .stat-revenue .stat-icon {
+    background: #ede9fe;
+    color: #7c3aed;
+  }
+}
+
+.section-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.token-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.patient-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.patient-uid {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quick-action-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f9fafb;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .qa-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .qa-patients { background: #dbeafe; color: #2563eb; }
+  .qa-appointments { background: #fef3c7; color: #d97706; }
+  .qa-prescriptions { background: #d1fae5; color: #059669; }
+  .qa-billing { background: #ede9fe; color: #7c3aed; }
+
+  .qa-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .qa-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+  }
+
+  .qa-desc {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  > svg:last-child {
+    color: #d1d5db;
+  }
+}
