@@ -1,0 +1,237 @@
+:host {
+  display: block;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.card-header-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+
+  svg {
+    color: #6366f1;
+  }
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.logo-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: #6b7280;
+
+  &:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+  }
+}
+
+// Color input with preview swatch
+.color-input-wrapper {
+  position: relative;
+
+  .color-preview {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid #e5e7eb;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .color-text-input {
+    padding-left: 42px;
+  }
+}
+
+// Branding preview section
+.branding-preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: background 0.2s, color 0.2s;
+
+  &.dark-preview {
+    background: #1f2937;
+
+    .preview-body {
+      background: #1f2937;
+    }
+
+    .preview-nav {
+      background: #111827;
+    }
+
+    .preview-nav-item {
+      color: #9ca3af;
+
+      &.active {
+        color: #ffffff;
+      }
+    }
+
+    .preview-content {
+      background: #1f2937;
+    }
+
+    .preview-card {
+      background: #374151;
+      border-color: #4b5563;
+    }
+
+    .preview-card-header {
+      color: #e5e7eb;
+    }
+
+    .preview-stat-label {
+      color: #9ca3af;
+    }
+  }
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: #ffffff;
+}
+
+.preview-logo-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.preview-clinic-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.preview-body {
+  display: flex;
+  min-height: 160px;
+}
+
+.preview-nav {
+  width: 130px;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  padding: 12px 8px;
+  flex-shrink: 0;
+}
+
+.preview-nav-item {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+  cursor: default;
+
+  &.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+.preview-content {
+  flex: 1;
+  padding: 16px;
+}
+
+.preview-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.preview-card-header {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.preview-stat-row {
+  display: flex;
+  gap: 20px;
+}
+
+.preview-stat {
+  text-align: center;
+}
+
+.preview-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.preview-stat-label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.preview-button {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.preview-accent-bar {
+  height: 4px;
+  border-radius: 2px;
+  width: 60%;
+}
+
+:host ::ng-deep {
+  .settings-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    .p-card-body {
+      padding: 20px;
+    }
+  }
+}

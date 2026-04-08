@@ -1,0 +1,198 @@
+<div class="container-fluid py-4">
+  <!-- Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <p-card styleClass="stat-card stat-patients">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Patients</span>
+            <span class="stat-value">{{ totalPatients() }}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <p-card styleClass="stat-card stat-queue">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Today's Queue</span>
+            <span class="stat-value">{{ todayQueueCount() }}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <p-card styleClass="stat-card stat-prescriptions">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Prescriptions Today</span>
+            <span class="stat-value">{{ prescriptionsToday() }}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <p-card styleClass="stat-card stat-revenue">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Revenue Today</span>
+            <span class="stat-value">{{ revenueToday() }}</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Today's Queue Table -->
+    <div class="col-xl-8">
+      <div class="section-card">
+        <div class="section-header">
+          <h5 class="section-title">Today's Queue</h5>
+          <a routerLink="/appointments" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <p-table [value]="queue()" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm p-datatable-striped">
+          <ng-template #header>
+            <tr>
+              <th>Token</th>
+              <th>Patient</th>
+              <th>Type</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-item>
+            <tr>
+              <td><span class="token-badge">{{ item.tokenNo }}</span></td>
+              <td>
+                <div class="patient-cell">
+                  <span class="patient-name">{{ item.patientName }}</span>
+                  <span class="patient-uid">{{ item.patientUid }}</span>
+                </div>
+              </td>
+              <td>{{ item.type }}</td>
+              <td>{{ item.scheduledTime }}</td>
+              <td>
+                <p-tag [value]="getStatusLabel(item.status)" [severity]="getStatusSeverity(item.status)" />
+              </td>
+              <td>
+                @if (getActionLabel(item.status)) {
+                  <p-button [label]="getActionLabel(item.status)" size="small" [outlined]="true" (onClick)="onQueueAction(item)" />
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-xl-4">
+      <div class="section-card">
+        <div class="section-header">
+          <h5 class="section-title">Quick Actions</h5>
+        </div>
+        <div class="quick-actions">
+          <a routerLink="/patients" class="quick-action-item">
+            <div class="qa-icon qa-patients">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="qa-info">
+              <span class="qa-title">Patients</span>
+              <span class="qa-desc">Manage patient records</span>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+          <a routerLink="/appointments" class="quick-action-item">
+            <div class="qa-icon qa-appointments">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div class="qa-info">
+              <span class="qa-title">Appointments</span>
+              <span class="qa-desc">View today's schedule</span>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+          <a routerLink="/prescriptions" class="quick-action-item">
+            <div class="qa-icon qa-prescriptions">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="qa-info">
+              <span class="qa-title">Prescriptions</span>
+              <span class="qa-desc">Write and view prescriptions</span>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+          <a routerLink="/billing" class="quick-action-item">
+            <div class="qa-icon qa-billing">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="qa-info">
+              <span class="qa-title">Billing</span>
+              <span class="qa-desc">Invoices and payments</span>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,175 @@
+:host {
+  display: block;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.summary-card {
+  position: relative;
+  padding: 20px 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  color: #fff;
+
+  .summary-count {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .summary-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  .summary-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+.summary-waiting {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.summary-consultation {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+.summary-completed {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  border-left: 4px solid transparent;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &.queue-active {
+    border-left-color: #14b8a6;
+    background: #f0fdfa;
+  }
+
+  &.queue-completed {
+    opacity: 0.65;
+  }
+}
+
+.queue-token {
+  flex-shrink: 0;
+
+  .token-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    font-weight: 700;
+    font-size: 16px;
+    color: #374151;
+  }
+}
+
+.queue-patient {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+  flex: 1;
+}
+
+.avatar-initials {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #e0e7ff;
+  color: #4338ca;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.patient-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.patient-uid {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.queue-type {
+  min-width: 100px;
+
+  .type-label {
+    font-size: 13px;
+    color: #6b7280;
+  }
+}
+
+.queue-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 80px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.queue-status {
+  min-width: 130px;
+}
+
+.queue-action {
+  min-width: 160px;
+  text-align: right;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+  display: block;
+}
