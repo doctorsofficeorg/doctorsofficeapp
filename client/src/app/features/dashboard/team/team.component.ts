@@ -84,6 +84,10 @@ export class TeamComponent {
   labTechCount = computed(() => this.members().filter(m => m.role === 'lab_tech').length);
   frontDeskCount = computed(() => this.members().filter(m => m.role === 'front_desk').length);
 
+  getInitials(name: string): string {
+    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
+
   getRoleSeverity(role: TeamRole): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
     switch (role) {
       case 'owner': return 'info';

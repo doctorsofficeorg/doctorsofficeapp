@@ -78,7 +78,7 @@
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="member-avatar" [class]="'avatar-' + member.role">
-                {{ member.name.split(' ').map(getFirstChar).join('').slice(0, 2) }}
+                {{ getInitials(member.name) }}
               </div>
               <div>
                 <div class="fw-semibold">{{ member.name }}</div>
@@ -105,7 +105,7 @@
           </td>
           <td>
             <div class="d-flex gap-1">
-              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" size="small" (onClick)="openEditDialog(member)" pTooltip="Edit" />
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" size="small" (onClick)="openEditDialog(member)" />
               @if (member.role !== 'owner') {
                 <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="removeMember(member)" pTooltip="Remove" />
               }
