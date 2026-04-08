@@ -107,7 +107,7 @@
             <div class="d-flex gap-1">
               <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" size="small" (onClick)="openEditDialog(member)" />
               @if (member.role !== 'owner') {
-                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="removeMember(member)" pTooltip="Remove" />
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="removeMember(member)" />
               }
             </div>
           </td>
