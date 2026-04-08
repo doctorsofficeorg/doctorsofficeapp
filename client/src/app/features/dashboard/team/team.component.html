@@ -77,7 +77,7 @@
         <tr>
           <td>
             <div class="d-flex align-items-center gap-2">
-              <div class="member-avatar" [class]="'avatar-' + member.role">
+              <div class="member-avatar" [ngClass]="'avatar-' + member.role">
                 {{ getInitials(member.name) }}
               </div>
               <div>
