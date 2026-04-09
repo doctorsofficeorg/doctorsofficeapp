@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================
 # Doctors Office — Deploy Apps to Azure
-# Run this AFTER azure-setup.sh has completed
+# Run AFTER azure-setup.sh has completed
 # ============================================================
 set -e
 
@@ -20,16 +20,21 @@ echo ""
 # ---- Deploy Backend ----
 echo "[1/2] Building & deploying backend..."
 cd "$ROOT_DIR/server"
-npm install --production
-npm run build
 
-# Create deployment package
+# Install ALL deps (including devDeps for TypeScript build)
+npm install
+
+# Build TypeScript using npx (finds local tsc)
+npx tsc
+
+# Prepare deployment package from dist/
 cd dist
 cp ../package.json ../package-lock.json .
+npm install --omit=dev > /dev/null 2>&1
 zip -r "$ROOT_DIR/server-deploy.zip" . > /dev/null
 cd "$ROOT_DIR"
 
-# Configure startup command
+# Configure startup and deploy
 az webapp config set \
   --name "$BACKEND_APP" \
   --resource-group "$RESOURCE_GROUP" \
@@ -51,9 +56,10 @@ echo ""
 echo "[2/2] Building & deploying frontend..."
 cd "$ROOT_DIR/client"
 
-# Update API URL to point to backend app
-# The Angular build will use environment.ts (production)
-# Make sure it points to the Azure backend
+# Install deps
+npm install
+
+# Update production environment to point to Azure backend
 cat > src/environments/environment.ts << ENVEOF
 export const environment = {
   production: true,
@@ -63,9 +69,10 @@ export const environment = {
 };
 ENVEOF
 
+# Build Angular
 npx ng build --configuration production
 
-# Create a simple Node.js server to serve the Angular app
+# Create a Node.js server to serve the SPA
 cd dist/client/browser
 cat > server.js << 'SERVEREOF'
 const express = require('express');
@@ -75,7 +82,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.static(__dirname));
 
-// All routes fall back to index.html (Angular SPA)
+// SPA fallback — all routes serve index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -94,6 +101,7 @@ cat > package.json << 'PKGEOF'
 }
 PKGEOF
 
+npm install > /dev/null 2>&1
 zip -r "$ROOT_DIR/client-deploy.zip" . > /dev/null
 cd "$ROOT_DIR"
 
@@ -111,6 +119,11 @@ az webapp deploy \
   --output none
 
 rm -f client-deploy.zip
+
+# Restore the original environment.ts
+cd "$ROOT_DIR/client"
+git checkout src/environments/environment.ts 2>/dev/null || true
+
 echo "  ✓ Frontend deployed: https://$FRONTEND_APP.azurewebsites.net"
 echo ""
 
