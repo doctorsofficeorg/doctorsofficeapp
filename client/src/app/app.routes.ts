@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, clinicGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -19,18 +19,37 @@ export const routes: Routes = [
       import('./features/auth/register/register.component').then(m => m.RegisterComponent),
   },
   {
+    path: 'clinics/select',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/clinics/select/clinic-select.component').then(m => m.ClinicSelectComponent),
+  },
+  {
+    path: 'clinics/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/clinics/new/clinic-new.component').then(m => m.ClinicNewComponent),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./layouts/dashboard-layout/dashboard-layout.component').then(
         m => m.DashboardLayoutComponent
       ),
-    canActivate: [authGuard],
+    canActivate: [clinicGuard],
     children: [
       {
         path: 'dashboard',
         loadComponent: () =>
           import('./features/dashboard/home/dashboard-home.component').then(
             m => m.DashboardHomeComponent
+          ),
+      },
+      {
+        path: 'schedule',
+        loadComponent: () =>
+          import('./features/dashboard/schedule/schedule.component').then(
+            m => m.ScheduleComponent
           ),
       },
       {

@@ -2,16 +2,25 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Next.js Dev Server",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
-      "port": 3000
+      "name": "angular-client",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["ng", "serve", "--port", "4201"],
+      "port": 4201,
+      "cwd": "client"
     },
     {
-      "name": "Drizzle Studio",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/drizzle-kit/bin.cjs", "studio"],
-      "port": 4983
+      "name": "express-server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "cwd": "server"
+    },
+    {
+      "name": "yjs-server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 1234,
+      "cwd": "yjs-server"
     }
   ]
 }

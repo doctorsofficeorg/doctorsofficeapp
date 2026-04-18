@@ -49,7 +49,7 @@
   <!-- Queue List -->
   <div class="queue-list">
     @for (item of queue(); track item._id) {
-      <div class="queue-item" [class.queue-completed]="item.status === 'completed'" [class.queue-active]="item.status === 'in-progress'">
+      <div class="queue-item" [class.queue-completed]="item.status === 'done'" [class.queue-active]="item.status === 'in_consultation'">
         <div class="queue-token">
           <span class="token-number">{{ item.tokenNo }}</span>
         </div>

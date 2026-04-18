@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -8,8 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
-import { ClinicService } from '../../../core/services/clinic.service';
-import { InvoiceListItem, PatientListItem, PaymentMode, PaymentStatus } from '../../../core/models';
+import { InvoiceStore } from '../../../core/stores/invoice.store';
+import { PatientStore } from '../../../core/stores/patient.store';
+import { PaymentMode, PaymentStatus } from '../../../core/models';
 import { formatCurrency } from '../../../core/utils/format';
 
 interface InvoiceItem {
@@ -25,14 +26,20 @@ interface InvoiceItem {
   imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TagModule, CardModule],
   templateUrl: './billing.component.html',
   styleUrl: './billing.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BillingComponent implements OnInit {
-  private clinicService = inject(ClinicService);
+  private invoiceStore = inject(InvoiceStore);
+  private patientStore = inject(PatientStore);
 
-  invoices = signal<InvoiceListItem[]>([]);
-  patientOptions = signal<{ label: string; value: string }[]>([]);
+  invoices = this.invoiceStore.listItems;
   showDialog = signal(false);
+
+  patientOptions = computed(() =>
+    this.patientStore.entities().map(p => ({
+      label: `${p.fullName} (${p.patientUid})`,
+      value: p._id,
+    }))
+  );
 
   form = {
     patientId: '',
@@ -50,7 +57,7 @@ export class BillingComponent implements OnInit {
     { label: 'UPI', value: 'upi' },
     { label: 'Card', value: 'card' },
     { label: 'Insurance', value: 'insurance' },
-    { label: 'Other', value: 'netbanking' },
+    { label: 'Other', value: 'other' },
   ];
 
   paymentStatusOptions = [
@@ -59,13 +66,8 @@ export class BillingComponent implements OnInit {
     { label: 'Partial', value: 'partial' },
   ];
 
-  todayRevenue = computed(() => {
-    const total = this.invoices().reduce((sum, inv) => sum + inv.grandTotal, 0);
-    return formatCurrency(total);
-  });
-
+  todayRevenue = computed(() => formatCurrency(this.invoiceStore.totalRevenue()));
   invoicesToday = computed(() => this.invoices().length);
-
   pendingPayments = computed(() =>
     this.invoices().filter(inv => inv.paymentStatus === 'pending' || inv.paymentStatus === 'partial').length
   );
@@ -83,13 +85,8 @@ export class BillingComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.clinicService.getInvoices().subscribe(data => this.invoices.set(data));
-    this.clinicService.getPatientsList().subscribe(data => {
-      this.patientOptions.set(data.map(p => ({
-        label: `${p.name} (${p.patientUid})`,
-        value: p._id,
-      })));
-    });
+    this.invoiceStore.loadAll();
+    this.patientStore.loadAll();
   }
 
   openNewInvoice(): void {
@@ -115,33 +112,26 @@ export class BillingComponent implements OnInit {
     this.items.update(list => [...list]);
   }
 
-  saveInvoice(): void {
-    const invoiceItems = this.items().map(item => ({
-      description: item.description,
-      quantity: item.quantity,
-      rate: item.unitPrice,
-      amount: item.amount,
-    }));
-
-    const gstHalf = Math.round(this.gstAmount() / 2 * 100) / 100;
-
-    this.clinicService.createInvoice({
+  async saveInvoice(): Promise<void> {
+    await this.invoiceStore.create({
       patientId: this.form.patientId,
-      items: invoiceItems,
+      items: this.items().map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+      })),
       subtotal: this.subtotal(),
-      cgst: gstHalf,
-      sgst: gstHalf,
-      igst: 0,
-      totalTax: this.gstAmount(),
+      gstPercent: this.form.gstPercent,
+      gstAmount: this.gstAmount(),
       discount: this.form.discount,
-      grandTotal: this.total(),
+      total: this.total(),
       paymentMode: this.form.paymentMode as PaymentMode,
       paymentStatus: this.form.paymentStatus as PaymentStatus,
       notes: this.form.notes || undefined,
-    }).subscribe(() => {
-      this.clinicService.getInvoices().subscribe(data => this.invoices.set(data));
-      this.closeDialog();
-    });
+    } as any);
+
+    this.closeDialog();
   }
 
   fc(amount: number): string {
@@ -163,7 +153,6 @@ export class BillingComponent implements OnInit {
       case 'paid': return 'success';
       case 'pending': return 'warn';
       case 'partial': return 'info';
-      case 'refunded': return 'danger';
       default: return 'secondary';
     }
   }

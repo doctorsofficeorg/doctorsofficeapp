@@ -1,0 +1,75 @@
+// Glassmorphism mixins & utility classes.
+// Four tiers: subtle, standard, elevated, inset.
+// All consume semantic tokens from _tokens.scss so dark mode swaps automatically.
+
+@mixin _glass-base($bg, $border, $blur, $saturate, $highlight, $shadow) {
+  background-color: $bg;
+  -webkit-backdrop-filter: blur($blur) saturate($saturate);
+          backdrop-filter: blur($blur) saturate($saturate);
+  border: 1px solid $border;
+  box-shadow: $highlight, $shadow;
+}
+
+@mixin glass-subtle {
+  @include _glass-base(
+    var(--do-surface-glass-subtle),
+    var(--do-border-glass-subtle),
+    12px,
+    140%,
+    var(--do-highlight-glass-subtle),
+    var(--do-shadow-glass-subtle)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--do-surface-glass-fallback);
+  }
+}
+
+@mixin glass-standard {
+  @include _glass-base(
+    var(--do-surface-glass),
+    var(--do-border-glass),
+    16px,
+    150%,
+    var(--do-highlight-glass),
+    var(--do-shadow-glass)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--do-surface-glass-fallback);
+  }
+}
+
+@mixin glass-elevated {
+  @include _glass-base(
+    var(--do-surface-glass-elevated),
+    var(--do-border-glass-elevated),
+    24px,
+    160%,
+    var(--do-highlight-glass-elevated),
+    var(--do-shadow-glass-elevated)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--do-surface-glass-fallback);
+  }
+}
+
+@mixin glass-inset {
+  background-color: var(--do-surface-glass-inset);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+          backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid var(--do-border-glass-subtle);
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.10);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--do-surface-glass-fallback);
+  }
+}
+
+// ── Utility classes ──
+
+.glass         { @include glass-standard; }
+.glass-subtle  { @include glass-subtle; }
+.glass-el      { @include glass-elevated; }
+.glass-inset   { @include glass-inset; }

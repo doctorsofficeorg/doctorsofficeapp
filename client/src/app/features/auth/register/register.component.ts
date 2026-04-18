@@ -1,9 +1,9 @@
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthStore } from '../../../core/stores/auth.store';
 
 @Component({
   selector: 'app-register',
@@ -11,10 +11,9 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [FormsModule, RouterLink, InputTextModule, ButtonModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
-  private authService = inject(AuthService);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
   step = signal<'details' | 'otp'>('details');
@@ -24,7 +23,7 @@ export class RegisterComponent {
   loading = signal(false);
   error = signal('');
 
-  sendOtp(): void {
+  async sendOtp(): Promise<void> {
     const name = this.fullName().trim();
     const phoneVal = this.phone().trim();
     if (!name) {
@@ -37,19 +36,19 @@ export class RegisterComponent {
     }
     this.loading.set(true);
     this.error.set('');
-    this.authService.sendOtp(phoneVal).subscribe({
-      next: () => {
-        this.step.set('otp');
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('Failed to send OTP. Please try again.');
-        this.loading.set(false);
-      },
-    });
+    const result = await this.authStore.sendOtp(phoneVal);
+    this.loading.set(false);
+    if (result.success) {
+      if (result.otp) {
+        console.log('[Dev] OTP:', result.otp);
+      }
+      this.step.set('otp');
+    } else {
+      this.error.set(result.message);
+    }
   }
 
-  verifyOtp(): void {
+  async verifyOtp(): Promise<void> {
     const otpVal = this.otp().trim();
     if (otpVal.length !== 6) {
       this.error.set('Please enter a valid 6-digit OTP');
@@ -57,16 +56,13 @@ export class RegisterComponent {
     }
     this.loading.set(true);
     this.error.set('');
-    this.authService.verifyOtp(this.phone().trim(), otpVal).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.error.set('Verification failed. Please try again.');
-        this.loading.set(false);
-      },
-    });
+    const result = await this.authStore.verifyOtp(this.phone().trim(), otpVal, this.fullName().trim());
+    this.loading.set(false);
+    if (result.success) {
+      this.router.navigate(['/clinics/select']);
+    } else {
+      this.error.set('Verification failed. Please try again.');
+    }
   }
 
   onNameInput(event: Event): void {

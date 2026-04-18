@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import { sendOtp, verifyOtp } from "../services/otp.service.js";
 import { signAccessToken, signRefreshToken, verifyToken } from "../services/token.service.js";
 import { User } from "../models/user.model.js";
-import { Clinic } from "../models/clinic.model.js";
-import { ClinicMembership, DEFAULT_PERMISSIONS } from "../models/clinic-membership.model.js";
+import { ClinicMembership } from "../models/clinic-membership.model.js";
 
 export async function sendOtpHandler(req: Request, res: Response): Promise<void> {
   try {
@@ -29,7 +28,7 @@ export async function sendOtpHandler(req: Request, res: Response): Promise<void>
 
 export async function verifyOtpHandler(req: Request, res: Response): Promise<void> {
   try {
-    const { phone, otp } = req.body;
+    const { phone, otp, fullName } = req.body;
 
     if (!phone || !otp) {
       res.status(400).json({ error: "Phone and OTP are required" });
@@ -49,60 +48,39 @@ export async function verifyOtpHandler(req: Request, res: Response): Promise<voi
 
     if (!user) {
       isNewUser = true;
-      user = await User.create({ phone, fullName: "Doctor" });
+      user = await User.create({
+        phone,
+        fullName: fullName?.trim() || "Doctor",
+      });
+    } else if (fullName?.trim()) {
+      // Update name if provided (e.g. user was invited but now sets their name)
+      user.fullName = fullName.trim();
     }
 
     // Update last login
     user.lastLoginAt = new Date();
     await user.save();
 
-    // Get user's clinic memberships
+    // Get user's clinic memberships. Do NOT auto-create a placeholder clinic
+    // here — the frontend onboarding flow guides the user through explicit
+    // clinic creation (or selection among existing memberships).
     const memberships = await ClinicMembership.find({ userId: user._id, isActive: true })
       .populate("clinicId")
       .lean();
 
-    // If new user, create a default clinic
-    if (isNewUser || memberships.length === 0) {
-      const clinic = await Clinic.create({
-        name: "My Clinic",
-        address: "Address pending",
-        city: "City pending",
-        state: "State pending",
-        pincode: "000000",
-        phone,
-        email: `user${Date.now()}@example.com`,
-        region: "india",
-        ownerId: user._id,
-      });
-
-      await ClinicMembership.create({
-        userId: user._id,
-        clinicId: clinic._id,
-        role: "owner",
-        permissions: DEFAULT_PERMISSIONS.owner,
-      });
-
-      memberships.push({
-        _id: clinic._id,
-        userId: user._id,
-        clinicId: clinic,
-        role: "owner",
-        permissions: DEFAULT_PERMISSIONS.owner,
-        isActive: true,
-        joinedAt: new Date(),
-      } as any);
-    }
-
-    // Default to first clinic
+    // If the user is a member of at least one clinic, scope tokens to the
+    // first one; otherwise the access token has no clinicId and the frontend
+    // routes the user to the "create clinic" onboarding page.
     const defaultMembership = memberships[0];
-    const defaultClinicId = (defaultMembership.clinicId as any)._id?.toString() ||
-      defaultMembership.clinicId.toString();
+    const defaultClinicId = defaultMembership
+      ? ((defaultMembership.clinicId as any)._id?.toString() ?? defaultMembership.clinicId.toString())
+      : null;
 
     const tokenPayload = {
       userId: user._id.toString(),
       phone: user.phone,
-      clinicId: defaultClinicId,
-      role: defaultMembership.role,
+      clinicId: defaultClinicId ?? "",
+      role: defaultMembership?.role ?? "owner",
     };
 
     const accessToken = signAccessToken(tokenPayload);
@@ -207,6 +185,44 @@ export async function switchClinicHandler(req: Request, res: Response): Promise<
   } catch (error) {
     console.error("[Auth] switchClinic error:", error);
     res.status(500).json({ error: "Failed to switch clinic" });
+  }
+}
+
+/**
+ * Update current user's profile.
+ */
+export async function updateProfileHandler(req: Request, res: Response): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+
+    const { fullName, email } = req.body;
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (fullName?.trim()) user.fullName = fullName.trim();
+    if (email !== undefined) user.email = email?.trim() || undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        phone: user.phone,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+      },
+    });
+  } catch (error) {
+    console.error("[Auth] updateProfile error:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   }
 }
 

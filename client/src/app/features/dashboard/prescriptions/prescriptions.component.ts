@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -8,12 +8,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { DatePickerModule } from 'primeng/datepicker';
-import { ClinicService } from '../../../core/services/clinic.service';
-import { PrescriptionListItem, PatientListItem, PrescriptionFrequency } from '../../../core/models';
+import { PrescriptionStore } from '../../../core/stores/prescription.store';
+import { PatientStore } from '../../../core/stores/patient.store';
+import { PrescriptionFrequency } from '../../../core/models';
 import { TiptapEditorComponent } from '../../../shared/components/tiptap-editor/tiptap-editor.component';
 
 interface MedicineRow {
-  drugName: string;
+  medicineName: string;
   dosage: string;
   frequency: string;
   duration: string;
@@ -29,14 +30,20 @@ interface MedicineRow {
   ],
   templateUrl: './prescriptions.component.html',
   styleUrl: './prescriptions.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrescriptionsComponent implements OnInit {
-  private clinicService = inject(ClinicService);
+  private prescriptionStore = inject(PrescriptionStore);
+  private patientStore = inject(PatientStore);
 
-  prescriptions = signal<PrescriptionListItem[]>([]);
-  patientOptions = signal<{ label: string; value: string }[]>([]);
+  prescriptions = this.prescriptionStore.listItems;
   showDialog = signal(false);
+
+  patientOptions = computed(() =>
+    this.patientStore.entities().map(p => ({
+      label: `${p.fullName} (${p.patientUid})`,
+      value: p._id,
+    }))
+  );
 
   form = {
     patientId: '',
@@ -47,11 +54,7 @@ export class PrescriptionsComponent implements OnInit {
 
   medicines = signal<MedicineRow[]>([]);
 
-  appointmentOptions = [
-    { label: 'Today 09:00 - Consultation', value: 'apt_001' },
-    { label: 'Today 09:30 - Consultation', value: 'apt_002' },
-    { label: 'Today 10:00 - Consultation', value: 'apt_003' },
-  ];
+  appointmentOptions = signal<{ label: string; value: string }[]>([]);
 
   frequencyOptions = [
     { label: 'OD (Once Daily)', value: 'OD' },
@@ -60,18 +63,13 @@ export class PrescriptionsComponent implements OnInit {
     { label: 'QID (Four Times)', value: 'QID' },
     { label: 'SOS (As Needed)', value: 'SOS' },
     { label: 'HS (At Bedtime)', value: 'HS' },
-    { label: 'STAT (Immediately)', value: 'stat' },
-    { label: 'PRN (As Required)', value: 'weekly' },
+    { label: 'STAT (Immediately)', value: 'STAT' },
+    { label: 'PRN (As Required)', value: 'PRN' },
   ];
 
   ngOnInit(): void {
-    this.clinicService.getPrescriptions().subscribe(data => this.prescriptions.set(data));
-    this.clinicService.getPatientsList().subscribe(data => {
-      this.patientOptions.set(data.map(p => ({
-        label: `${p.name} (${p.patientUid})`,
-        value: p._id,
-      })));
-    });
+    this.prescriptionStore.loadAll();
+    this.patientStore.loadAll();
   }
 
   openNewPrescription(): void {
@@ -96,27 +94,24 @@ export class PrescriptionsComponent implements OnInit {
     this.medicines.update(list => list.filter((_, i) => i !== index));
   }
 
-  savePrescription(): void {
+  async savePrescription(): Promise<void> {
     const items = this.medicines().map(m => ({
-      drugName: m.drugName,
+      medicineName: m.medicineName,
       dosage: m.dosage,
       frequency: m.frequency as PrescriptionFrequency,
       duration: m.duration,
-      route: 'Oral',
       instructions: m.instructions,
     }));
 
-    this.clinicService.createPrescription({
+    await this.prescriptionStore.create({
       patientId: this.form.patientId,
       appointmentId: this.form.appointmentId || undefined,
       diagnosis: this.form.content,
-      complaints: '',
       items,
       followUpDate: this.form.followUpDate ? this.form.followUpDate.toISOString().split('T')[0] : undefined,
-    }).subscribe(() => {
-      this.clinicService.getPrescriptions().subscribe(data => this.prescriptions.set(data));
-      this.closeDialog();
-    });
+    } as any);
+
+    this.closeDialog();
   }
 
   formatDate(dateStr: string): string {
@@ -128,6 +123,6 @@ export class PrescriptionsComponent implements OnInit {
   }
 
   private emptyMedicine(): MedicineRow {
-    return { drugName: '', dosage: '', frequency: '', duration: '', instructions: '' };
+    return { medicineName: '', dosage: '', frequency: '', duration: '', instructions: '' };
   }
 }

@@ -64,7 +64,7 @@
       <div class="col-md-6">
         <label class="form-label">Select Appointment</label>
         <p-select
-          [options]="appointmentOptions"
+          [options]="appointmentOptions()"
           [(ngModel)]="form.appointmentId"
           placeholder="Select appointment"
           styleClass="w-100"
@@ -95,7 +95,7 @@
           @for (med of medicines(); track $index; let i = $index) {
             <div class="med-row">
               <div class="med-col med-name">
-                <input type="text" pInputText class="w-100" [(ngModel)]="med.drugName" placeholder="Drug name" />
+                <input type="text" pInputText class="w-100" [(ngModel)]="med.medicineName" placeholder="Medicine name" />
               </div>
               <div class="med-col med-dosage">
                 <input type="text" pInputText class="w-100" [(ngModel)]="med.dosage" placeholder="e.g. 500mg" />

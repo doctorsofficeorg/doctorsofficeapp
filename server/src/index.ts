@@ -1,3 +1,7 @@
+import dns from "node:dns";
+// Use Google DNS for SRV record resolution (needed for MongoDB Atlas on some networks)
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -67,6 +71,24 @@ async function start(): Promise<void> {
     await mongoose.connect(config.mongodbUri);
     console.log("[MongoDB] Connected successfully");
 
+    // One-shot cleanup: drop any legacy global unique indexes on Patient
+    // collection that are no longer in the schema. These indexes pre-dated
+    // multi-tenancy and caused cross-clinic collisions.
+    try {
+      const coll = mongoose.connection.collection("patients");
+      const indexes = await coll.indexes();
+      const keep = new Set(["_id_", "clinicId_1", "clinicId_1_phone_1", "clinicId_1_fullName_text", "patientUid_1"]);
+      for (const idx of indexes) {
+        if (!idx.name || keep.has(idx.name)) continue;
+        if (idx.unique) {
+          await coll.dropIndex(idx.name);
+          console.log(`[MongoDB] Dropped stale unique index: patients.${idx.name}`);
+        }
+      }
+    } catch (e) {
+      console.warn("[MongoDB] Index cleanup skipped:", (e as Error).message);
+    }
+
     // Connect to Redis (graceful fallback)
     console.log("[Redis] Connecting...");
     await initRedis();
@@ -78,7 +100,7 @@ async function start(): Promise<void> {
       console.log(`  Environment : ${config.nodeEnv}`);
       console.log(`  Port        : ${config.port}`);
       console.log(`  MongoDB     : ${config.mongodbUri}`);
-      console.log(`  Redis       : ${config.redisUrl}`);
+      console.log(`  Redis       : ${config.redisHost}:${config.redisPort}`);
       console.log("─────────────────────────────────────────");
     });
   } catch (error) {

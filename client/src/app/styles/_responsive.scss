@@ -1,0 +1,38 @@
+// Mobile-first breakpoints. Keep in sync with primitive.breakpoint tokens.
+// Usage:
+//   @include bp-up(md) { ... }   // min-width: 768px
+//   @include bp-down(lg) { ... } // max-width: 1023.98px
+
+@use "sass:map";
+
+$breakpoints: (
+  xs: 0,
+  sm: 480px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+);
+
+@mixin bp-up($name) {
+  $min: map.get($breakpoints, $name);
+  @if $min == null {
+    @error "Unknown breakpoint `#{$name}`.";
+  }
+  @if $min == 0 {
+    @content;
+  } @else {
+    @media (min-width: #{$min}) { @content; }
+  }
+}
+
+@mixin bp-down($name) {
+  $max: map.get($breakpoints, $name);
+  @if $max == null {
+    @error "Unknown breakpoint `#{$name}`.";
+  }
+  @if $max == 0 {
+    @content;
+  } @else {
+    @media (max-width: #{$max - 0.02px}) { @content; }
+  }
+}

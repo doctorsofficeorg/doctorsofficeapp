@@ -1,0 +1,219 @@
+@use "../../../styles/glass";
+@use "../../../styles/responsive" as r;
+
+:host { display: block; }
+
+.onboarding-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding-top {
+  @include glass.glass-standard;
+  border-radius: 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.onboarding-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--do-brand-primary);
+  font-weight: 700;
+
+  span { color: var(--do-text-primary); }
+}
+
+.link-btn {
+  background: transparent;
+  border: none;
+  color: var(--do-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+
+  &:hover { background: var(--do-surface-glass-subtle); color: var(--do-text-primary); }
+}
+
+.onboarding-body {
+  flex: 1;
+  max-width: 920px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+
+  @include r.bp-up(md) { padding: 56px 40px; }
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 28px;
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--do-text-muted);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--do-text-primary);
+
+    @include r.bp-up(md) { font-size: 30px; }
+  }
+
+  p {
+    margin: 0;
+    color: var(--do-text-secondary);
+    font-size: 15px;
+    max-width: 640px;
+  }
+}
+
+.clinic-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @include r.bp-up(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include r.bp-up(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.clinic-card {
+  @include glass.glass-standard;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  text-align: left;
+  color: var(--do-text-primary);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 200ms ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--do-brand-primary) 18%, transparent);
+  }
+
+  &:disabled { cursor: not-allowed; opacity: 0.7; }
+  &.loading { opacity: 0.6; }
+
+  .chev {
+    color: var(--do-text-muted);
+    transition: transform 150ms ease, color 150ms ease;
+  }
+
+  &:hover:not(:disabled) .chev {
+    transform: translateX(2px);
+    color: var(--do-brand-primary);
+  }
+}
+
+.clinic-card--new {
+  border-style: dashed;
+  background: transparent;
+
+  .chev { display: none; }
+}
+
+.clinic-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--do-brand-primary) 16%, transparent);
+  color: var(--do-brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.clinic-avatar--new {
+  background: color-mix(in srgb, var(--do-brand-secondary) 16%, transparent);
+  color: var(--do-brand-secondary);
+}
+
+.clinic-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.clinic-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--do-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clinic-role {
+  font-size: 12px;
+  color: var(--do-text-muted);
+  margin-top: 2px;
+}
+
+.empty-state {
+  @include glass.glass-standard;
+  border-radius: 24px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  .empty-illustration {
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--do-brand-primary) 14%, transparent);
+    color: var(--do-brand-primary);
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--do-text-primary);
+  }
+
+  p {
+    margin: 0 0 12px;
+    max-width: 420px;
+    color: var(--do-text-secondary);
+  }
+}

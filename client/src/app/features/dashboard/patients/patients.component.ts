@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -7,11 +7,11 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { ClinicService } from '../../../core/services/clinic.service';
+import { PatientStore } from '../../../core/stores/patient.store';
 import { Patient } from '../../../core/models';
 
 interface PatientForm {
-  name: string;
+  fullName: string;
   phone: string;
   email: string;
   dateOfBirth: string;
@@ -31,12 +31,11 @@ interface PatientForm {
   imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TagModule],
   templateUrl: './patients.component.html',
   styleUrl: './patients.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PatientsComponent implements OnInit {
-  private clinicService = inject(ClinicService);
+  private patientStore = inject(PatientStore);
 
-  patients = signal<Patient[]>([]);
+  patients = this.patientStore.entities;
   searchQuery = signal('');
   showDialog = signal(false);
 
@@ -64,7 +63,8 @@ export class PatientsComponent implements OnInit {
   }
 
   loadPatients(): void {
-    this.clinicService.getPatients(this.searchQuery()).subscribe(data => this.patients.set(data));
+    const search = this.searchQuery();
+    this.patientStore.loadAll(search ? { search } : undefined);
   }
 
   onSearch(event: Event): void {
@@ -77,7 +77,8 @@ export class PatientsComponent implements OnInit {
     return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  getAge(dob: string): number {
+  getAge(dob: string | undefined): number | string {
+    if (!dob) return '-';
     const today = new Date();
     const birthDate = new Date(dob);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -109,29 +110,28 @@ export class PatientsComponent implements OnInit {
     this.showDialog.set(false);
   }
 
-  savePatient(): void {
+  async savePatient(): Promise<void> {
     const data: Partial<Patient> = {
-      name: this.form.name,
+      fullName: this.form.fullName,
       phone: this.form.phone,
       email: this.form.email || undefined,
-      dateOfBirth: this.form.dateOfBirth,
+      dateOfBirth: this.form.dateOfBirth || undefined,
       gender: this.form.gender as Patient['gender'],
       bloodGroup: this.form.bloodGroup as Patient['bloodGroup'],
       address: this.form.address || undefined,
       emergencyContact: this.form.emergencyContact || undefined,
-      medicalHistory: this.form.medicalHistory ? this.form.medicalHistory.split('\n').filter(s => s.trim()) : [],
-      allergies: this.form.allergies ? this.form.allergies.split('\n').filter(s => s.trim()) : [],
+      medicalHistory: this.form.medicalHistory || undefined,
+      allergies: this.form.allergies || undefined,
+      notes: this.form.notes || undefined,
     };
 
-    this.clinicService.createPatient(data).subscribe(patient => {
-      this.patients.update(list => [...list, patient]);
-      this.closeDialog();
-    });
+    await this.patientStore.create(data);
+    this.closeDialog();
   }
 
   private getEmptyForm(): PatientForm {
     return {
-      name: '',
+      fullName: '',
       phone: '',
       email: '',
       dateOfBirth: '',

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -7,8 +7,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
-import { ClinicService } from '../../../core/services/clinic.service';
-import { QueueItem, PatientListItem, AppointmentStatus } from '../../../core/models';
+import { AppointmentStore } from '../../../core/stores/appointment.store';
+import { PatientStore } from '../../../core/stores/patient.store';
+import { QueueItem, AppointmentStatus } from '../../../core/models';
 
 @Component({
   selector: 'app-appointments',
@@ -16,53 +17,54 @@ import { QueueItem, PatientListItem, AppointmentStatus } from '../../../core/mod
   imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TagModule, CardModule],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppointmentsComponent implements OnInit {
-  private clinicService = inject(ClinicService);
+  private appointmentStore = inject(AppointmentStore);
+  private patientStore = inject(PatientStore);
 
-  queue = signal<QueueItem[]>([]);
-  patientOptions = signal<{ label: string; value: string; id: string }[]>([]);
+  queue = this.appointmentStore.queue;
   showWalkInDialog = signal(false);
+
+  patientOptions = computed(() =>
+    this.patientStore.entities().map(p => ({
+      label: `${p.fullName} (${p.patientUid})`,
+      value: p._id,
+      id: p._id,
+    }))
+  );
 
   walkInForm = {
     patientId: '',
     complaint: '',
   };
 
-  waitingCount = computed(() => this.queue().filter(q => q.status === 'waiting' || q.status === 'scheduled').length);
-  inConsultationCount = computed(() => this.queue().filter(q => q.status === 'in-progress').length);
-  completedCount = computed(() => this.queue().filter(q => q.status === 'completed').length);
+  waitingCount = this.appointmentStore.waitingCount;
+  inConsultationCount = this.appointmentStore.inConsultationCount;
+  completedCount = this.appointmentStore.doneCount;
 
   ngOnInit(): void {
-    this.clinicService.getTodayQueue().subscribe(data => this.queue.set(data));
-    this.clinicService.getPatientsList().subscribe(data => {
-      this.patientOptions.set(data.map(p => ({
-        label: `${p.name} (${p.patientUid})`,
-        value: p._id,
-        id: p._id,
-      })));
-    });
+    this.appointmentStore.loadTodayQueue();
+    this.patientStore.loadAll();
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
     switch (status) {
-      case 'completed': return 'success';
-      case 'in-progress': return 'info';
+      case 'done': return 'success';
+      case 'in_consultation': return 'info';
       case 'waiting': return 'warn';
-      case 'scheduled': return 'secondary';
       case 'cancelled': return 'danger';
+      case 'no_show': return 'danger';
       default: return 'secondary';
     }
   }
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'completed': return 'Completed';
-      case 'in-progress': return 'In Consultation';
+      case 'done': return 'Completed';
+      case 'in_consultation': return 'In Consultation';
       case 'waiting': return 'Waiting';
-      case 'scheduled': return 'Scheduled';
       case 'cancelled': return 'Cancelled';
+      case 'no_show': return 'No Show';
       default: return status;
     }
   }
@@ -70,8 +72,7 @@ export class AppointmentsComponent implements OnInit {
   getActionLabel(status: string): string {
     switch (status) {
       case 'waiting': return 'Start Consultation';
-      case 'in-progress': return 'Complete';
-      case 'scheduled': return 'Check In';
+      case 'in_consultation': return 'Complete';
       default: return '';
     }
   }
@@ -79,8 +80,7 @@ export class AppointmentsComponent implements OnInit {
   getActionSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
     switch (status) {
       case 'waiting': return 'info';
-      case 'in-progress': return 'success';
-      case 'scheduled': return 'warn';
+      case 'in_consultation': return 'success';
       default: return 'secondary';
     }
   }
@@ -89,22 +89,16 @@ export class AppointmentsComponent implements OnInit {
     return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  onAction(item: QueueItem): void {
+  async onAction(item: QueueItem): Promise<void> {
     let newStatus: AppointmentStatus;
     if (item.status === 'waiting') {
-      newStatus = 'in-progress';
-    } else if (item.status === 'in-progress') {
-      newStatus = 'completed';
-    } else if (item.status === 'scheduled') {
-      newStatus = 'waiting';
+      newStatus = 'in_consultation';
+    } else if (item.status === 'in_consultation') {
+      newStatus = 'done';
     } else {
       return;
     }
-    this.clinicService.updateAppointmentStatus(item.appointmentId, newStatus).subscribe(() => {
-      this.queue.update(q => q.map(qi =>
-        qi._id === item._id ? { ...qi, status: newStatus } : qi
-      ));
-    });
+    await this.appointmentStore.updateStatus(item.appointmentId, newStatus);
   }
 
   openWalkInDialog(): void {
@@ -116,33 +110,13 @@ export class AppointmentsComponent implements OnInit {
     this.showWalkInDialog.set(false);
   }
 
-  saveWalkIn(): void {
-    const selectedPatient = this.patientOptions().find(p => p.value === this.walkInForm.patientId);
-    if (!selectedPatient) return;
+  async saveWalkIn(): Promise<void> {
+    if (!this.walkInForm.patientId) return;
 
-    this.clinicService.createAppointment({
+    await this.appointmentStore.createAppointment({
       patientId: this.walkInForm.patientId,
-      patientName: selectedPatient.label.split(' (')[0],
-      type: 'Walk-in',
-      notes: this.walkInForm.complaint,
-    }).subscribe(() => {
-      const maxToken = this.queue().reduce((max, q) => Math.max(max, q.tokenNo), 0);
-      const newItem: QueueItem = {
-        _id: 'q_new_' + Date.now(),
-        tokenNo: maxToken + 1,
-        patientId: this.walkInForm.patientId,
-        patientName: selectedPatient.label.split(' (')[0],
-        patientUid: selectedPatient.label.match(/\((.*?)\)/)?.[1] ?? '',
-        appointmentId: 'apt_new_' + Date.now(),
-        doctorId: 'doc_001',
-        doctorName: 'Dr. Meera Sharma',
-        status: 'waiting',
-        type: 'Walk-in',
-        scheduledTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }),
-        checkInTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      };
-      this.queue.update(q => [...q, newItem]);
-      this.closeWalkInDialog();
+      chiefComplaint: this.walkInForm.complaint || 'Walk-in',
     });
+    this.closeWalkInDialog();
   }
 }

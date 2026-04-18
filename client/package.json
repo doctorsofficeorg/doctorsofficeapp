@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "tokens": "node scripts/build-tokens.mjs",
+    "tokens:check": "node scripts/build-tokens.mjs --check"
   },
   "private": true,
   "packageManager": "npm@10.9.7",
@@ -19,10 +21,11 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@microsoft/clarity": "^1.0.2",
+    "@ngrx/signals": "^21.1.0",
     "@primeng/themes": "^21.0.4",
     "@tiptap/core": "^3.22.3",
     "@tiptap/extension-collaboration": "^3.22.3",
-    "@tiptap/extension-collaboration-cursor": "^2.26.2",
+    "@tiptap/extension-collaboration-cursor": "^3.0.0",
     "@tiptap/pm": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "bootstrap": "^5.3.8",

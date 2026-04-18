@@ -1,0 +1,32 @@
+<article class="queue-card">
+  <div class="token">#{{ item().tokenNo }}</div>
+
+  <div class="info">
+    <div class="top-row">
+      <span class="name">{{ item().patientName }}</span>
+      <p-tag [value]="getStatusLabel(item().status)" [severity]="getStatusSeverity(item().status)" />
+    </div>
+    <div class="meta">
+      <span class="uid">{{ item().patientUid }}</span>
+      <span class="dot">•</span>
+      <span class="type">{{ item().type }}</span>
+      <span class="dot">•</span>
+      <span class="time">{{ item().scheduledTime }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    @if (item().status !== 'done' && item().status !== 'cancelled') {
+      <button class="mini-btn mini-btn--ghost" (click)="vitals.emit(item())" type="button" aria-label="Get vitals">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 22l8.8-9.4a5.5 5.5 0 0 0 0-8z"/>
+        </svg>
+      </button>
+    }
+    @if (getActionLabel(item().status)) {
+      <button class="mini-btn mini-btn--primary" (click)="action.emit(item())" type="button">
+        {{ getActionLabel(item().status) }}
+      </button>
+    }
+  </div>
+</article>

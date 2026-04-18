@@ -1,88 +1,105 @@
-<div class="container-fluid py-4">
-  <!-- Stat Cards -->
-  <div class="row g-3 mb-4">
-    <div class="col-xl-3 col-md-6">
-      <p-card styleClass="stat-card stat-patients">
-        <div class="stat-content">
-          <div class="stat-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Total Patients</span>
-            <span class="stat-value">{{ totalPatients() }}</span>
-          </div>
-        </div>
-      </p-card>
+<section class="page-surface">
+  <!-- Greeting / practitioner bar -->
+  <div class="practitioner-bar">
+    <div class="practitioner-info">
+      <span class="greeting">Welcome back</span>
+      <span class="practitioner-name">{{ doctorName() }}</span>
+      @if (doctorCredentials()) {
+        <span class="practitioner-credentials">{{ doctorCredentials() }}</span>
+      }
     </div>
-    <div class="col-xl-3 col-md-6">
-      <p-card styleClass="stat-card stat-queue">
-        <div class="stat-content">
-          <div class="stat-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Today's Queue</span>
-            <span class="stat-value">{{ todayQueueCount() }}</span>
-          </div>
-        </div>
-      </p-card>
-    </div>
-    <div class="col-xl-3 col-md-6">
-      <p-card styleClass="stat-card stat-prescriptions">
-        <div class="stat-content">
-          <div class="stat-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Prescriptions Today</span>
-            <span class="stat-value">{{ prescriptionsToday() }}</span>
-          </div>
-        </div>
-      </p-card>
-    </div>
-    <div class="col-xl-3 col-md-6">
-      <p-card styleClass="stat-card stat-revenue">
-        <div class="stat-content">
-          <div class="stat-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Revenue Today</span>
-            <span class="stat-value">{{ revenueToday() }}</span>
-          </div>
-        </div>
-      </p-card>
-    </div>
+    @if (loginTimeFormatted()) {
+      <div class="practitioner-login-time">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>{{ loginTimeFormatted() }}</span>
+      </div>
+    }
   </div>
 
-  <div class="row g-3">
-    <!-- Today's Queue Table -->
-    <div class="col-xl-8">
-      <div class="section-card">
-        <div class="section-header">
-          <h5 class="section-title">Today's Queue</h5>
-          <a routerLink="/appointments" class="btn btn-sm btn-outline-primary">View All</a>
+  <!-- Stat cards: 2x2 on mobile, 4-up on lg -->
+  <div class="stat-grid">
+    <article class="stat-card stat-queue">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8"  y1="2" x2="8"  y2="6"/>
+          <line x1="3"  y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Today's Queue</span>
+        <span class="stat-value">{{ todayQueueCount() }}</span>
+      </div>
+    </article>
+
+    <article class="stat-card stat-waiting">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Waiting</span>
+        <span class="stat-value">{{ waitingCount() }}</span>
+      </div>
+    </article>
+
+    <article class="stat-card stat-prescriptions">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Prescriptions</span>
+        <span class="stat-value">{{ prescriptionsToday() }}</span>
+      </div>
+    </article>
+
+    <article class="stat-card stat-revenue">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Revenue Today</span>
+        <span class="stat-value">{{ revenueToday() }}</span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Body grid -->
+  <div class="body-grid">
+    <!-- Today's Queue -->
+    <div class="section-card queue-section">
+      <div class="section-header">
+        <h5 class="section-title">Today's Queue</h5>
+        <a routerLink="/appointments" class="link-button">View all</a>
+      </div>
+
+      @if (isMobile()) {
+        <div class="queue-list">
+          @for (item of queue(); track item._id) {
+            <app-queue-card
+              [item]="item"
+              (vitals)="openVitalsDialog($event)"
+              (action)="onQueueAction($event)" />
+          } @empty {
+            <p class="empty-state">No patients in the queue today.</p>
+          }
         </div>
-        <p-table [value]="queue()" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm p-datatable-striped">
+      } @else {
+        <p-table [value]="queue()" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm">
           <ng-template #header>
             <tr>
               <th>Token</th>
@@ -108,91 +125,181 @@
                 <p-tag [value]="getStatusLabel(item.status)" [severity]="getStatusSeverity(item.status)" />
               </td>
               <td>
-                @if (getActionLabel(item.status)) {
-                  <p-button [label]="getActionLabel(item.status)" size="small" [outlined]="true" (onClick)="onQueueAction(item)" />
-                }
+                <div class="d-flex gap-2 align-items-center">
+                  @if (item.status !== 'done' && item.status !== 'cancelled') {
+                    <p-button label="Get Vitals" icon="pi pi-heart" size="small" severity="info" [outlined]="true" (onClick)="openVitalsDialog(item)" />
+                  }
+                  @if (getActionLabel(item.status)) {
+                    <p-button [label]="getActionLabel(item.status)" size="small" [outlined]="true" (onClick)="onQueueAction(item)" />
+                  }
+                </div>
               </td>
             </tr>
           </ng-template>
         </p-table>
-      </div>
+      }
     </div>
 
     <!-- Quick Actions -->
-    <div class="col-xl-4">
-      <div class="section-card">
-        <div class="section-header">
-          <h5 class="section-title">Quick Actions</h5>
-        </div>
-        <div class="quick-actions">
-          <a routerLink="/patients" class="quick-action-item">
-            <div class="qa-icon qa-patients">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <div class="qa-info">
-              <span class="qa-title">Patients</span>
-              <span class="qa-desc">Manage patient records</span>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
+    <div class="section-card quick-section">
+      <div class="section-header">
+        <h5 class="section-title">Quick Actions</h5>
+      </div>
+      <div class="quick-actions">
+        <a routerLink="/patients" class="quick-action-item">
+          <div class="qa-icon qa-patients">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-          </a>
-          <a routerLink="/appointments" class="quick-action-item">
-            <div class="qa-icon qa-appointments">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-            </div>
-            <div class="qa-info">
-              <span class="qa-title">Appointments</span>
-              <span class="qa-desc">View today's schedule</span>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
+          </div>
+          <div class="qa-info">
+            <span class="qa-title">Patients</span>
+            <span class="qa-desc">Manage records</span>
+          </div>
+          <svg class="qa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+        <a routerLink="/appointments" class="quick-action-item">
+          <div class="qa-icon qa-appointments">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
-          </a>
-          <a routerLink="/prescriptions" class="quick-action-item">
-            <div class="qa-icon qa-prescriptions">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-              </svg>
-            </div>
-            <div class="qa-info">
-              <span class="qa-title">Prescriptions</span>
-              <span class="qa-desc">Write and view prescriptions</span>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
+          </div>
+          <div class="qa-info">
+            <span class="qa-title">Appointments</span>
+            <span class="qa-desc">Today's schedule</span>
+          </div>
+          <svg class="qa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+        <a routerLink="/prescriptions" class="quick-action-item">
+          <div class="qa-icon qa-prescriptions">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
-          </a>
-          <a routerLink="/billing" class="quick-action-item">
-            <div class="qa-icon qa-billing">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="1" x2="12" y2="23"/>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-            </div>
-            <div class="qa-info">
-              <span class="qa-title">Billing</span>
-              <span class="qa-desc">Invoices and payments</span>
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
+          </div>
+          <div class="qa-info">
+            <span class="qa-title">Prescriptions</span>
+            <span class="qa-desc">Write and view</span>
+          </div>
+          <svg class="qa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+        <a routerLink="/billing" class="quick-action-item">
+          <div class="qa-icon qa-billing">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
-          </a>
-        </div>
+          </div>
+          <div class="qa-info">
+            <span class="qa-title">Billing</span>
+            <span class="qa-desc">Invoices &amp; payments</span>
+          </div>
+          <svg class="qa-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Floating action button (mobile only) -->
+  @if (isMobile() && firstWaiting()) {
+    <button class="fab" (click)="startNext()" type="button" aria-label="Start consultation for next patient">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      <span>Start next</span>
+    </button>
+  }
+
+  <!-- Vitals Dialog -->
+  <p-dialog
+    [(visible)]="vitalsDialogVisible"
+    [header]="'Get Vitals — ' + (selectedQueueItem()?.patientName ?? '')"
+    [modal]="true"
+    [style]="{ width: '640px' }"
+    [breakpoints]="{ '960px': '80vw', '640px': '95vw' }"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="vitals-dialog"
+    (onHide)="onVitalsDialogHide()">
+
+    <div class="vitals-grid">
+      <!-- Blood Pressure -->
+      <div class="field">
+        <label class="form-label fw-semibold">Blood Pressure (mmHg)</label>
+        <div class="d-flex gap-2 align-items-center">
+          <p-inputNumber [(ngModel)]="vitals.bloodPressureSystolic" placeholder="Sys" [min]="50" [max]="300" [maxFractionDigits]="0" styleClass="flex-fill" />
+          <span class="text-muted fw-bold">/</span>
+          <p-inputNumber [(ngModel)]="vitals.bloodPressureDiastolic" placeholder="Dia" [min]="20" [max]="200" [maxFractionDigits]="0" styleClass="flex-fill" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">Heart Rate (bpm)</label>
+        <p-inputNumber [(ngModel)]="vitals.heartRate" placeholder="e.g. 72" [min]="20" [max]="250" [maxFractionDigits]="0" styleClass="w-100" />
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">Temperature</label>
+        <div class="d-flex gap-2 align-items-center">
+          <p-inputNumber [(ngModel)]="vitals.temperature" placeholder="98.6" [min]="80" [max]="115" [minFractionDigits]="1" [maxFractionDigits]="1" styleClass="flex-fill" />
+          <p-selectButton [(ngModel)]="vitals.temperatureUnit" [options]="tempUnitOptions" optionLabel="label" optionValue="value" [allowEmpty]="false" styleClass="temp-toggle" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">SpO2 (%)</label>
+        <p-inputNumber [(ngModel)]="vitals.spo2" placeholder="98" [min]="50" [max]="100" [maxFractionDigits]="0" suffix="%" styleClass="w-100" />
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">Respiratory Rate</label>
+        <p-inputNumber [(ngModel)]="vitals.respiratoryRate" placeholder="16" [min]="5" [max]="60" [maxFractionDigits]="0" styleClass="w-100" />
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">Weight (kg)</label>
+        <p-inputNumber [(ngModel)]="vitals.weight" placeholder="68" [min]="1" [max]="300" [minFractionDigits]="1" [maxFractionDigits]="1" suffix=" kg" styleClass="w-100" (ngModelChange)="calculateBmi()" />
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">Height (cm)</label>
+        <p-inputNumber [(ngModel)]="vitals.height" placeholder="170" [min]="30" [max]="250" [maxFractionDigits]="0" suffix=" cm" styleClass="w-100" (ngModelChange)="calculateBmi()" />
+      </div>
+
+      <div class="field">
+        <label class="form-label fw-semibold">BMI</label>
+        <div class="bmi-display">
+          @if (vitals.bmi) {
+            <span class="bmi-value">{{ vitals.bmi }}</span>
+            <span class="bmi-category" [class]="getBmiCategoryClass(vitals.bmi)">{{ getBmiCategory(vitals.bmi) }}</span>
+          } @else {
+            <span class="text-muted fst-italic">Auto-calculated</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="d-flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="vitalsDialogVisible = false" />
+        <p-button label="Save Vitals" icon="pi pi-check" (onClick)="saveVitals()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</section>

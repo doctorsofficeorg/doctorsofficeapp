@@ -64,14 +64,14 @@
       </ng-template>
       <ng-template #body let-inv>
         <tr>
-          <td><span class="fw-semibold">{{ inv.invoiceNo }}</span></td>
+          <td><span class="fw-semibold">{{ inv.invoiceNumber }}</span></td>
           <td>
             <div>
               <div class="fw-semibold">{{ inv.patientName }}</div>
               <div class="text-muted small">{{ inv.patientUid }}</div>
             </div>
           </td>
-          <td class="fw-semibold">{{ fc(inv.grandTotal) }}</td>
+          <td class="fw-semibold">{{ fc(inv.total) }}</td>
           <td>
             <p-tag [value]="formatPaymentMode(inv.paymentMode)" [severity]="getPaymentModeSeverity(inv.paymentMode)" />
           </td>

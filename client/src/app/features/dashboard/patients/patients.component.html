@@ -35,9 +35,9 @@
         <tr>
           <td>
             <div class="d-flex align-items-center gap-2">
-              <div class="avatar-initials">{{ getInitials(patient.name) }}</div>
+              <div class="avatar-initials">{{ getInitials(patient.fullName) }}</div>
               <div>
-                <div class="fw-semibold">{{ patient.name }}</div>
+                <div class="fw-semibold">{{ patient.fullName }}</div>
                 <div class="text-muted small">{{ patient.patientUid }}</div>
               </div>
             </div>
@@ -70,7 +70,7 @@
     <div class="row g-3 pt-2">
       <div class="col-md-6">
         <label class="form-label">Full Name <span class="text-danger">*</span></label>
-        <input type="text" pInputText class="w-100" [(ngModel)]="form.name" placeholder="Enter full name" />
+        <input type="text" pInputText class="w-100" [(ngModel)]="form.fullName" placeholder="Enter full name" />
       </div>
       <div class="col-md-6">
         <label class="form-label">Phone (+91) <span class="text-danger">*</span></label>
@@ -120,7 +120,7 @@
     <ng-template #footer>
       <div class="d-flex justify-content-end gap-2">
         <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="closeDialog()" />
-        <p-button label="Save Patient" icon="pi pi-check" (onClick)="savePatient()" [disabled]="!form.name || !form.phone || !form.gender" />
+        <p-button label="Save Patient" icon="pi pi-check" (onClick)="savePatient()" [disabled]="!form.fullName || !form.phone || !form.gender" />
       </div>
     </ng-template>
   </p-dialog>

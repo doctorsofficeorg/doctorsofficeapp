@@ -1,0 +1,24 @@
+// Aurora backdrop — gives glass something vibrant to blur.
+// Constrained lightness range so WCAG AA contrast still holds against the solid fallback.
+
+.bg-aurora {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--do-surface-page);
+  // Light: fresh airy washes over white — mint, sky, peach.
+  background-image:
+    radial-gradient(900px  700px at  -5%   0%, color-mix(in srgb, var(--do-brand-primary)   28%, transparent) 0%, transparent 55%),
+    radial-gradient(850px  600px at 105%  10%, color-mix(in srgb, #60a5fa                    26%, transparent) 0%, transparent 55%),
+    radial-gradient(900px  700px at  95% 100%, color-mix(in srgb, var(--do-brand-accent)    22%, transparent) 0%, transparent 60%),
+    radial-gradient(700px  600px at  10% 110%, color-mix(in srgb, var(--do-brand-secondary) 18%, transparent) 0%, transparent 60%);
+  background-attachment: fixed;
+  min-height: 100%;
+}
+
+// Dark theme dials gradients down so they don't blow out contrast.
+[data-theme="dark"] .bg-aurora {
+  background-image:
+    radial-gradient(1000px 600px at 10%   0%, color-mix(in srgb, var(--do-brand-primary)   18%, transparent) 0%, transparent 65%),
+    radial-gradient(900px  700px at 100% 10%, color-mix(in srgb, var(--do-brand-secondary) 14%, transparent) 0%, transparent 65%),
+    radial-gradient(700px  500px at 50% 100%, color-mix(in srgb, var(--do-brand-accent)    10%, transparent) 0%, transparent 75%);
+}

@@ -1,0 +1,361 @@
+<section class="schedule-page">
+  <!-- ── Toolbar ── -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="today-pill" type="button" (click)="goToday()">Today</button>
+      <button class="icon-btn" type="button" (click)="goPrev()" aria-label="Previous day">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="icon-btn" type="button" (click)="goNext()" aria-label="Next day">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="date-block">
+        <span class="date-label">{{ dateLabel() }}</span>
+        <span class="date-sub">{{ summarySubtitle() }}</span>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <p-selectButton
+        [options]="viewModeOptions" optionLabel="label" optionValue="value"
+        [ngModel]="viewMode()" (ngModelChange)="viewMode.set($event)"
+        [allowEmpty]="false" styleClass="view-toggle" />
+
+      <div class="filter-pill">
+        <div class="pill-avatar">{{ doctor()?.fullName?.substring(0, 2)?.toUpperCase() ?? 'DR' }}</div>
+        <span class="pill-label">{{ doctor()?.fullName ?? 'Doctor' }}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+
+      <p-select
+        [options]="statusOptions" optionLabel="label" optionValue="value"
+        [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
+        styleClass="status-select" appendTo="body" />
+
+      @if (isDesktop()) {
+        <span class="shortcut-hint">T today · D day · W week · N new · / search</span>
+      }
+    </div>
+  </div>
+
+  <!-- ── 3-column body ── -->
+  <div class="schedule-body">
+    <!-- LEFT: Today's schedule — 24hr day grid -->
+    <aside class="col col-schedule">
+      <header class="panel-head">
+        <h3>Today's schedule</h3>
+        <span class="panel-sub">{{ totalAppointments() }} appts · {{ arrivedCount() }} arrived</span>
+        <button class="seed-btn" type="button" [disabled]="seeding()" (click)="seedDemoData()" [attr.aria-label]="'Load demo schedule'">
+          @if (seeding()) {
+            <span class="seed-spin" aria-hidden="true"></span>
+            <span>Seeding…</span>
+          } @else {
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 3"/><polyline points="21 3 21 9 15 9"/></svg>
+            <span>Load demo</span>
+          }
+        </button>
+      </header>
+      @if (seedError()) {
+        <div class="seed-error">{{ seedError() }}</div>
+      }
+
+      <div class="day-scroll" #dayScroll>
+        <div class="day-grid" [style.height.px]="gridTotalHeightPx()">
+          @for (h of HOURS; track h) {
+            <button
+              class="hour-row"
+              type="button"
+              [class.is-now]="isNowHour(h)"
+              [style.height.px]="HOUR_HEIGHT"
+              [style.top.px]="h * HOUR_HEIGHT"
+              [attr.aria-label]="'Book at ' + hourLabel(h)"
+              (click)="openBookingAt(h, 0)">
+              <span class="hour-label">{{ hourLabel(h) }}</span>
+              <span class="hour-hint">+ Click to add</span>
+            </button>
+          }
+
+          <!-- Appointments overlaid on the grid -->
+          @for (item of filteredQueue(); track item._id) {
+            <button
+              class="day-slot"
+              type="button"
+              [class]="slotTone(item.status, item.type)"
+              [class.active]="selectedAppointment()?._id === item._id"
+              [style.top.px]="appointmentTopPx(item)"
+              [style.height.px]="appointmentHeightPx(item)"
+              (click)="$event.stopPropagation(); selectAppointment(item._id)">
+              <span class="slot-accent" aria-hidden="true"></span>
+              <span class="slot-body">
+                <span class="slot-name">{{ item.patientName }}</span>
+                <span class="slot-meta">{{ item.scheduledTime }} · {{ statusLabel(item.status) }} · {{ feeForItem(item) }}</span>
+              </span>
+            </button>
+          }
+
+          <!-- Now indicator -->
+          <div class="now-line" [style.top.px]="nowTopPx()">
+            <span class="now-dot"></span>
+            <span class="now-bar"></span>
+            <span class="now-label">Now · {{ nowLabel() }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MIDDLE: Patient detail -->
+    <section class="col col-patient">
+      @if (selectedAppointment(); as s) {
+        <div class="patient-top">
+          <p-tag value="Currently viewing" severity="warn" styleClass="viewing-chip" />
+          <div class="patient-top-actions">
+            <button class="mini-pill" type="button">Message</button>
+            <button class="mini-pill" type="button">Call</button>
+            <button class="mini-pill" type="button">Collect ₹</button>
+            <p-button label="Open chart" icon="pi pi-arrow-up-right" iconPos="right" [outlined]="true" size="small" />
+            <p-button label="Start visit" icon="pi pi-play" size="small" />
+          </div>
+        </div>
+
+        <div class="identity">
+          <div class="identity-avatar">{{ selectedInitials() }}</div>
+          <div class="identity-info">
+            <h2 class="patient-name">{{ s.patientName }}</h2>
+            <span class="patient-meta">MRN {{ s.patientUid || 'DO-—' }} · Token #{{ s.tokenNo }}</span>
+            <div class="patient-tags">
+              <p-tag value="New patient" severity="info" />
+              <p-tag value="Allergy" severity="danger" />
+              <p-tag value="HTN" severity="secondary" />
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Vitals -->
+        <div class="vitals-head">
+          <h3>Vitals</h3>
+          <span class="visit-chip">Today · {{ dateLabel() }} (Visit 5 of 5)</span>
+          <div class="pagination">
+            <button class="icon-btn sm" type="button" aria-label="Previous visit">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="icon-btn sm" type="button" aria-label="Next visit">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <span class="dots">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot active"></span>
+            </span>
+            <span class="visit-note">· recorded 09:48 by Ravi</span>
+          </div>
+          <button class="edit-btn" type="button">Edit</button>
+        </div>
+
+        <div class="vitals-grid">
+          @for (v of vitalTiles(); track v.key) {
+            <article class="vital-tile" [class]="'tone-' + v.tone">
+              <span class="tile-label">{{ v.label }}</span>
+              <span class="tile-value">{{ v.value }}</span>
+              <span class="tile-delta">{{ v.delta }}<span class="tile-unit" *ngIf="v.unit"> · {{ v.unit }}</span></span>
+            </article>
+          }
+        </div>
+
+        <!-- Trend chart -->
+        <div class="trend-head">
+          <h3>Trend · last 6 visits</h3>
+          <div class="legend">
+            <span class="legend-item"><i class="legend-dot" style="background: var(--do-feedback-danger);"></i>BP systolic</span>
+            <span class="legend-item"><i class="legend-dot" style="background: var(--do-feedback-warning);"></i>BP diastolic</span>
+            <span class="legend-item"><i class="legend-dot" style="background: var(--do-brand-primary);"></i>Pulse</span>
+            <span class="legend-item"><i class="legend-dot" style="background: var(--do-brand-secondary);"></i>Weight (kg)</span>
+          </div>
+          <div class="range-toggle">
+            <button class="range-btn active" type="button">6v</button>
+            <button class="range-btn" type="button">3m</button>
+            <button class="range-btn" type="button">1y</button>
+          </div>
+        </div>
+
+        <div class="trend-chart">
+          <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" preserveAspectRatio="none">
+            <g stroke="var(--do-border-subtle)" stroke-dasharray="3 4">
+              <line [attr.x1]="chartPadX" [attr.x2]="chartW - chartPadX" y1="40"  y2="40"  />
+              <line [attr.x1]="chartPadX" [attr.x2]="chartW - chartPadX" y1="80"  y2="80"  />
+              <line [attr.x1]="chartPadX" [attr.x2]="chartW - chartPadX" y1="120" y2="120" />
+            </g>
+            <path [attr.d]="pathBpSys()"  stroke="var(--do-feedback-danger)"  stroke-width="2" fill="none" />
+            <path [attr.d]="pathBpDia()"  stroke="var(--do-feedback-warning)" stroke-width="2" fill="none" />
+            <path [attr.d]="pathPulse()"  stroke="var(--do-brand-primary)"    stroke-width="2" fill="none" />
+            <path [attr.d]="pathWeight()" stroke="var(--do-brand-secondary)"  stroke-width="2" fill="none" />
+            @for (p of pointsBpSys();  track $index) { <circle [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="var(--do-feedback-danger)"/> }
+            @for (p of pointsBpDia();  track $index) { <circle [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="var(--do-feedback-warning)"/> }
+            @for (p of pointsPulse();  track $index) { <circle [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="var(--do-brand-primary)"/> }
+            @for (p of pointsWeight(); track $index) { <circle [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="var(--do-brand-secondary)"/> }
+          </svg>
+          <div class="x-labels">
+            @for (p of trend(); track $index) {
+              <span class="x-label">{{ p.label }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Chief complaint + last Rx -->
+        <div class="two-col">
+          <div class="mini-card">
+            <h4>Chief complaint</h4>
+            <p class="mini-quote">"Chest tightness on exertion for 2 weeks. Worse on stairs. No radiation, no syncope."</p>
+            <span class="mini-foot">Logged by front desk · 09:45</span>
+          </div>
+          <div class="mini-card">
+            <h4>Last prescription</h4>
+            <p class="mini-line"><strong>Amlodipine 5 mg</strong> · 1-0-0 · 30d</p>
+            <p class="mini-line">Telmisartan 40 mg · 1-0-0 · 30d</p>
+            <span class="mini-foot">Rx #4 · signed Dr. Priya · 20 Mar 2026</span>
+          </div>
+        </div>
+
+        <div class="cta-strip">
+          <div>
+            <strong>Ready to begin?</strong> Opens encounter with SOAP + Rx tabs.
+            <span class="shortcut">Shortcut: Press S</span>
+          </div>
+          <p-button label="Start visit" icon="pi pi-arrow-right" iconPos="right" />
+        </div>
+      } @else {
+        <div class="empty-patient">
+          <div class="empty-illustration">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8"  y1="2" x2="8"  y2="6"/>
+              <line x1="3"  y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3>No appointment selected</h3>
+          <p>Pick a slot on the left to see patient details, vitals, and quick actions.</p>
+        </div>
+      }
+    </section>
+
+    <!-- RIGHT: Context rail -->
+    <aside class="col col-rail">
+      <div class="panel rail-panel">
+        <header class="panel-head">
+          <h3>Today at a glance</h3>
+        </header>
+        <div class="kpi-grid">
+          <article class="kpi kpi-teal">
+            <span class="kpi-label">Appointments</span>
+            <span class="kpi-value">{{ totalAppointments() }}</span>
+          </article>
+          <article class="kpi kpi-amber">
+            <span class="kpi-label">No-shows</span>
+            <span class="kpi-value">{{ noShowsCount() }}</span>
+          </article>
+          <article class="kpi kpi-indigo kpi-wide">
+            <span class="kpi-label">Expected revenue</span>
+            <span class="kpi-value">{{ expectedRevenue() }}</span>
+            <span class="kpi-foot">{{ collectedRevenue() }} collected</span>
+          </article>
+        </div>
+      </div>
+
+      <div class="panel rail-panel">
+        <header class="panel-head waitlist-head">
+          <h3>Waitlist</h3>
+          <span class="count-chip">{{ waitlist().length }}</span>
+        </header>
+        <ul class="waitlist">
+          @for (w of waitlist(); track w.id) {
+            <li class="wait-item">
+              <div class="wait-info">
+                <span class="wait-name">{{ w.name }}</span>
+                <span class="wait-sub">{{ w.subtitle }}</span>
+              </div>
+              @if (w.cta === 'offer') {
+                <button class="offer-btn primary" type="button">Offer slot</button>
+              } @else {
+                <button class="offer-btn ghost" type="button">Offer</button>
+              }
+            </li>
+          }
+        </ul>
+        <button class="link-row" type="button">View all {{ waitlist().length }} →</button>
+      </div>
+
+      <div class="panel rail-panel">
+        <header class="panel-head">
+          <h3>Tomorrow preview</h3>
+          <span class="panel-sub">{{ tomorrow().length }} slots booked</span>
+        </header>
+        <ul class="tomorrow-list">
+          @for (t of tomorrow(); track $index) {
+            <li>
+              <span class="t-time">{{ t.time }}</span>
+              <span class="t-name">{{ t.name }}</span>
+              <span class="t-type">{{ t.type }}</span>
+            </li>
+          }
+        </ul>
+        <button class="link-row teal" type="button">View full day →</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Booking dialog -->
+  <p-dialog
+    [visible]="bookingVisible()"
+    (visibleChange)="bookingVisible.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '480px' }"
+    [breakpoints]="{ '640px': '95vw' }"
+    [header]="'New appointment · ' + bookingTimeLabel()"
+    styleClass="booking-dialog"
+    (onHide)="closeBooking()">
+    <div class="booking-form">
+      <label class="field">
+        <span class="label">Time</span>
+        <div class="time-row">
+          <p-select
+            styleClass="time-select"
+            [options]="HOURS" [ngModel]="bookingHour()" (ngModelChange)="bookingHour.set($event)"
+            appendTo="body" />
+          <span class="sep">:</span>
+          <p-select
+            styleClass="time-select"
+            [options]="MINUTE_OPTIONS" [ngModel]="bookingMinute()" (ngModelChange)="bookingMinute.set($event)"
+            appendTo="body" />
+        </div>
+      </label>
+      <label class="field">
+        <span class="label">Patient</span>
+        @if (patients().length > 0) {
+          <p-select
+            [options]="patientOptions()" optionLabel="label" optionValue="value"
+            [ngModel]="bookingPatientId()" (ngModelChange)="bookingPatientId.set($event)"
+            [filter]="true" placeholder="Search patients…" appendTo="body" styleClass="w-100" />
+        } @else {
+          <div class="empty-hint">No patients yet — add one from the Patients page first.</div>
+        }
+      </label>
+      <label class="field">
+        <span class="label">Chief complaint <small>(optional)</small></span>
+        <input pInputText type="text"
+          [ngModel]="bookingComplaint()" (ngModelChange)="bookingComplaint.set($event)"
+          placeholder="e.g. Chest tightness on exertion" />
+      </label>
+      @if (bookingError()) {
+        <div class="booking-error">{{ bookingError() }}</div>
+      }
+    </div>
+    <ng-template #footer>
+      <div class="booking-actions">
+        <p-button severity="secondary" [outlined]="true" label="Cancel" (onClick)="closeBooking()" />
+        <p-button label="Book" icon="pi pi-check" [loading]="bookingBusy()" [disabled]="!bookingPatientId() || bookingBusy()" (onClick)="confirmBooking()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</section>

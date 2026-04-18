@@ -9,7 +9,12 @@ export function getRedisClient(): Redis | null {
 
 export function initRedis(): Promise<Redis | null> {
   return new Promise((resolve) => {
-    const client = new Redis(config.redisUrl, {
+    const client = new Redis({
+      host: config.redisHost,
+      port: config.redisPort,
+      username: config.redisUsername || undefined,
+      password: config.redisPassword || undefined,
+      tls: undefined,
       maxRetriesPerRequest: 3,
       retryStrategy(times: number) {
         if (times > 3) {

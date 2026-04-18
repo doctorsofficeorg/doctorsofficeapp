@@ -6,6 +6,7 @@ import {
   refreshTokenHandler,
   switchClinicHandler,
   getMeHandler,
+  updateProfileHandler,
 } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -26,6 +27,7 @@ router.post("/refresh", refreshTokenHandler);
 
 // Authenticated routes
 router.get("/me", authMiddleware, getMeHandler);
+router.put("/profile", authMiddleware, updateProfileHandler);
 router.post("/switch-clinic", authMiddleware, switchClinicHandler);
 
 export default router;

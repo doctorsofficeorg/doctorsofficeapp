@@ -1,0 +1,170 @@
+// PrimeNG Aura → Doctors Office semantic token bridge.
+// Placed inside the `overrides` cascade layer (configured in app.config.ts) so
+// our rules always beat Aura without needing ::ng-deep or !important.
+
+@use "./glass";
+
+// Declare cascade-layer order BEFORE the @layer overrides block below, so the
+// overrides layer sits last (highest precedence). Must match `cssLayer.order`
+// in providePrimeNG() (app.config.ts).
+@layer base, primeng, overrides;
+
+@layer overrides {
+
+  // ── Brand colors ──
+  :root {
+    --p-primary-color: var(--do-brand-primary);
+    --p-primary-contrast-color: var(--do-brand-primary-contrast);
+    --p-primary-hover-color: var(--do-brand-primary-hover);
+    --p-primary-active-color: var(--do-brand-primary-hover);
+
+    --p-content-background: var(--do-surface-glass);
+    --p-content-hover-background: var(--do-surface-glass-elevated);
+    --p-content-border-color: var(--do-border-glass);
+    --p-content-color: var(--do-text-primary);
+
+    --p-text-color: var(--do-text-primary);
+    --p-text-muted-color: var(--do-text-muted);
+
+    --p-overlay-modal-background: var(--do-surface-glass-elevated);
+    --p-overlay-popover-background: var(--do-surface-glass-elevated);
+    --p-overlay-select-background: var(--do-surface-glass-elevated);
+    --p-overlay-modal-border-color: var(--do-border-glass-elevated);
+    --p-overlay-popover-border-color: var(--do-border-glass-elevated);
+
+    --p-form-field-background: var(--do-surface-glass-inset);
+    --p-form-field-disabled-background: var(--do-surface-glass-subtle);
+    --p-form-field-border-color: var(--do-border-glass);
+    --p-form-field-focus-border-color: var(--do-brand-primary);
+    --p-form-field-color: var(--do-text-primary);
+
+    --p-mask-background: var(--do-surface-scrim);
+  }
+
+  // Dialog + popover + dropdown: promote to elevated glass.
+  .p-dialog,
+  .p-popover,
+  .p-select-overlay,
+  .p-datepicker-panel,
+  .p-menu,
+  .p-contextmenu,
+  .p-confirmpopup,
+  .p-tieredmenu {
+    @include glass.glass-elevated;
+    border-radius: 16px;
+    color: var(--do-text-primary);
+  }
+
+  // Card: stat panels and section wrappers feel best with subtle glass.
+  .p-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  // DataTable header bar — standard glass.
+  .p-datatable .p-datatable-header {
+    @include glass.glass-standard;
+  }
+  .p-datatable .p-datatable-thead > tr > th {
+    background: transparent;
+    color: var(--do-text-secondary);
+    border-color: var(--do-border-subtle);
+  }
+  .p-datatable .p-datatable-tbody > tr {
+    background: transparent;
+    color: var(--do-text-primary);
+  }
+  .p-datatable .p-datatable-tbody > tr > td {
+    border-color: var(--do-border-subtle);
+  }
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background: var(--do-surface-glass-subtle);
+  }
+
+  // Inputs: inset glass + full contrast text.
+  .p-inputtext,
+  .p-inputnumber-input,
+  .p-textarea,
+  .p-password-input,
+  .p-select {
+    @include glass.glass-inset;
+    color: var(--do-text-primary);
+    border-radius: 10px;
+    transition: border-color 180ms ease, box-shadow 220ms ease;
+
+    &::placeholder { color: var(--do-text-muted); }
+    &:focus, &:focus-within {
+      outline: none;
+      border-color: color-mix(in srgb, var(--do-brand-primary) 55%, transparent);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--do-brand-primary) 45%, transparent),
+        0 0 14px 2px color-mix(in srgb, var(--do-brand-primary) 28%, transparent);
+    }
+  }
+
+  // Buttons — pill-shaped, keep Aura structure but swap colors.
+  .p-button {
+    border-radius: 9999px;
+    transition: transform 120ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    &:not(:disabled):hover { transform: translateY(-1px); }
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--do-brand-primary) 40%, transparent),
+                  0 0 16px 2px color-mix(in srgb, var(--do-brand-primary) 25%, transparent);
+    }
+  }
+
+  // SelectButton segments — preserve the grouped look (half-pills on ends).
+  .p-selectbutton .p-button {
+    border-radius: 0;
+    &:first-child { border-top-left-radius: 9999px; border-bottom-left-radius: 9999px; }
+    &:last-child  { border-top-right-radius: 9999px; border-bottom-right-radius: 9999px; }
+  }
+
+  .p-button.p-button-outlined {
+    border-color: var(--do-border-strong);
+    color: var(--do-text-primary);
+    &:hover { background: var(--do-surface-glass-subtle); }
+  }
+
+  .p-button.p-button-text {
+    color: var(--do-text-secondary);
+    &:hover { background: var(--do-surface-glass-subtle); }
+  }
+
+  // Tags — background alpha tints of semantic colors.
+  .p-tag {
+    border-radius: 9999px;
+    font-weight: 600;
+    padding: 2px 10px;
+  }
+  .p-tag.p-tag-success { background: color-mix(in srgb, var(--do-feedback-success) 18%, transparent); color: var(--do-feedback-success); }
+  .p-tag.p-tag-info    { background: color-mix(in srgb, var(--do-feedback-info) 18%, transparent);    color: var(--do-feedback-info); }
+  .p-tag.p-tag-warn    { background: color-mix(in srgb, var(--do-feedback-warning) 22%, transparent); color: var(--do-feedback-warning); }
+  .p-tag.p-tag-danger  { background: color-mix(in srgb, var(--do-feedback-danger) 18%, transparent);  color: var(--do-feedback-danger); }
+  .p-tag.p-tag-secondary { background: var(--do-surface-glass-subtle); color: var(--do-text-secondary); }
+
+  // SelectButton — glass group.
+  .p-selectbutton .p-button {
+    background: var(--do-surface-glass-inset);
+    color: var(--do-text-secondary);
+    border-color: var(--do-border-glass);
+    &.p-button-highlight {
+      background: var(--do-brand-primary);
+      color: var(--do-brand-primary-contrast);
+      border-color: var(--do-brand-primary);
+    }
+  }
+
+  // Dialog header / footer separators — tone down for glass.
+  .p-dialog .p-dialog-header,
+  .p-dialog .p-dialog-footer {
+    background: transparent;
+    border-color: var(--do-border-subtle);
+  }
+  .p-dialog .p-dialog-title {
+    color: var(--do-text-primary);
+    font-weight: 600;
+  }
+}

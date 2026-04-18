@@ -51,8 +51,27 @@ patientSchema.index({ clinicId: 1, fullName: "text" });
  */
 patientSchema.pre("validate", async function (next) {
   if (this.isNew && !this.patientUid) {
-    const count = await mongoose.model("Patient").countDocuments({ clinicId: this.clinicId });
-    this.patientUid = `PT-${String(count + 1).padStart(5, "0")}`;
+    // `patientUid` has a legacy *global* unique index. We generate
+    // `PT-{last4OfClinicId}-{counter}` so clinics never collide, and retry a
+    // few times against live DB state for safety. Falls back to a base36
+    // timestamp if the retry budget is exhausted.
+    const Model = mongoose.model("Patient");
+    const clinicSuffix = this.clinicId.toString().slice(-4).toUpperCase();
+    const count = await Model.countDocuments({ clinicId: this.clinicId });
+
+    let resolved = false;
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const candidate = `PT-${clinicSuffix}-${String(count + 1 + attempt).padStart(4, "0")}`;
+      const exists = await Model.exists({ patientUid: candidate });
+      if (!exists) {
+        this.patientUid = candidate;
+        resolved = true;
+        break;
+      }
+    }
+    if (!resolved) {
+      this.patientUid = `PT-${clinicSuffix}-${Date.now().toString(36).toUpperCase()}`;
+    }
   }
   next();
 });

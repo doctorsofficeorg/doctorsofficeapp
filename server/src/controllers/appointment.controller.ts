@@ -96,14 +96,16 @@ export async function getTodayQueue(req: Request, res: Response): Promise<void> 
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    // Return ALL statuses for today so the schedule view can render done,
+    // cancelled, and no-show slots with distinct tones. Consumers that only
+    // want the active queue filter client-side.
     const appointments = await Appointment.find({
       clinicId,
       doctorId,
       appointmentDate: { $gte: today, $lt: tomorrow },
-      status: { $in: ["waiting", "in_consultation"] },
     })
       .populate("patientId", "fullName phone patientUid age gender")
-      .sort({ tokenNumber: 1 });
+      .sort({ appointmentDate: 1, tokenNumber: 1 });
 
     const stats = await Appointment.aggregate([
       {

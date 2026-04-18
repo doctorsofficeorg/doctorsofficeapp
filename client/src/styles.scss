@@ -1,24 +1,61 @@
-@use "bootstrap/scss/bootstrap";
-// PrimeNG theme will be configured in app.config.ts
 @use "primeicons/primeicons.css";
 
-// Custom global styles for Doctors Office
-:root {
-  --do-primary: #0d9488;
-  --do-primary-dark: #0f766e;
-  --do-primary-light: #14b8a6;
-  --do-bg: #f8fafb;
-  --do-surface: #ffffff;
-  --do-text: #1e293b;
-  --do-text-secondary: #64748b;
-  --do-text-muted: #94a3b8;
-  --do-border: #e2e8f0;
-  --do-border-subtle: #f1f5f9;
+// Design tokens (auto-generated from client/src/design-tokens/tokens.json).
+@use "./app/styles/tokens";
+
+// SCSS-only utilities (mixins + classes).
+@use "./app/styles/responsive";
+@use "./app/styles/glass";
+@use "./app/styles/backgrounds";
+@use "./app/styles/primeng-aura-overrides";
+
+// Declare cascade-layer order. Must match `cssLayer.order` in providePrimeNG()
+// (app.config.ts). Later layers override earlier ones; unlayered styles beat
+// all layered styles, so we wrap Bootstrap into the `base` layer below.
+@layer base, primeng, overrides;
+
+// Bootstrap lives in the `base` layer so our `overrides` layer wins without
+// !important. Sass @import inlines the content at compile time.
+@layer base {
+  @import "bootstrap/scss/bootstrap";
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--do-bg);
-  color: var(--do-text);
+  color: var(--do-text-primary);
+  background-color: var(--do-surface-page);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+// Shared focus-visible style — outlined ring for keyboard nav.
+// Inputs manage their own focus (softer border + glow) so we exempt them.
+:focus-visible {
+  outline: 2px solid var(--do-brand-primary);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.p-inputtext:focus-visible,
+.p-inputnumber-input:focus-visible,
+.p-textarea:focus-visible,
+.p-password-input:focus-visible,
+.p-select:focus-visible,
+.p-select:focus-within {
+  outline: none;
+}
+
+// Reduced motion: trim transitions/animations.
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

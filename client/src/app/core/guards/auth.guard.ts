@@ -1,22 +1,37 @@
 import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-import { environment } from '../../../environments/environment';
+import { AuthStore } from '../stores/auth.store';
 
 export const authGuard: CanActivateFn = () => {
-  const authService = inject(AuthService);
+  const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  // Dev mode: always allow access
-  if (!environment.production) {
-    return true;
-  }
-
-  if (authService.isAuthenticated()) {
+  if (authStore.isAuthenticated()) {
     return true;
   }
 
   router.navigate(['/login']);
   return false;
+};
+
+/**
+ * Authenticated AND has a clinic membership selected. Use for dashboard pages
+ * — users with zero clinics get bounced to the onboarding flow.
+ */
+export const clinicGuard: CanActivateFn = () => {
+  const authStore = inject(AuthStore);
+  const router = inject(Router);
+
+  if (!authStore.isAuthenticated()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  if (!authStore.activeClinicId()) {
+    router.navigate(['/clinics/select']);
+    return false;
+  }
+
+  return true;
 };

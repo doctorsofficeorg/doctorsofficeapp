@@ -22,7 +22,10 @@ export interface IAppointment extends Document {
 const appointmentSchema = new Schema<IAppointment>(
   {
     clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: "Doctor", required: true, index: true },
+    // Doctor identity is derived from User + ClinicMembership; there's no
+    // dedicated `Doctor` Mongoose model in this multi-tenant setup, so we
+    // reference `User` for populate() compatibility.
+    doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true, index: true },
     appointmentDate: { type: Date, required: true, index: true },
     tokenNumber: { type: Number, required: true },

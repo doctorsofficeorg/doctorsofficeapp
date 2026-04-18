@@ -43,21 +43,19 @@ export interface ClinicMembership {
 
 export interface ClinicListItem {
   clinicId: string;
-  name: string;
-  city?: string;
+  clinicName: string;
   role: ClinicRole;
   branding?: ClinicBranding;
 }
 
 // ────────────────────────────────────────────
-// Domain models
+// Domain models (aligned with server schemas)
 // ────────────────────────────────────────────
 
-// Type aliases
-export type AppointmentStatus = 'scheduled' | 'waiting' | 'in-progress' | 'completed' | 'cancelled' | 'no-show';
-export type PrescriptionFrequency = 'OD' | 'BD' | 'TDS' | 'QID' | 'SOS' | 'HS' | 'stat' | 'weekly';
-export type PaymentMode = 'cash' | 'upi' | 'card' | 'netbanking' | 'insurance';
-export type PaymentStatus = 'pending' | 'paid' | 'partial' | 'refunded' | 'cancelled';
+export type AppointmentStatus = 'waiting' | 'in_consultation' | 'done' | 'cancelled' | 'no_show';
+export type PrescriptionFrequency = 'OD' | 'BD' | 'TDS' | 'QID' | 'SOS' | 'HS' | 'STAT' | 'PRN';
+export type PaymentMode = 'cash' | 'upi' | 'card' | 'insurance' | 'other';
+export type PaymentStatus = 'paid' | 'pending' | 'partial';
 
 export interface Clinic {
   _id: string;
@@ -77,39 +75,39 @@ export interface Clinic {
   updatedAt: string;
 }
 
+/** Derived from User + ClinicMembership for display purposes */
 export interface Doctor {
   _id: string;
   clinicId: string;
-  name: string;
+  fullName: string;
   phone: string;
   email?: string;
-  specialization: string;
-  qualification: string;
-  registrationNo: string;
-  gender: 'male' | 'female' | 'other';
+  specialization?: string;
+  qualification?: string;
+  registrationNumber?: string;
+  gender?: 'male' | 'female' | 'other';
   avatarUrl?: string;
-  isOwner: boolean;
-  createdAt: string;
-  updatedAt: string;
+  role: ClinicRole;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Patient {
   _id: string;
   clinicId: string;
   patientUid: string;
-  name: string;
+  fullName: string;
   phone: string;
   email?: string;
   gender: 'male' | 'female' | 'other';
-  dateOfBirth: string;
+  dateOfBirth?: string;
+  age?: number;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   address?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
   emergencyContact?: string;
-  allergies?: string[];
-  medicalHistory?: string[];
+  allergies?: string;
+  medicalHistory?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -117,16 +115,16 @@ export interface Patient {
 export interface Appointment {
   _id: string;
   clinicId: string;
-  patientId: string;
-  doctorId: string;
-  patientName: string;
-  doctorName: string;
-  date: string;
-  time: string;
+  patientId: string | { _id: string; fullName: string; phone: string; patientUid?: string };
+  doctorId: string | { _id: string; fullName: string };
+  appointmentDate: string;
+  tokenNumber: number;
   status: AppointmentStatus;
-  type: string;
+  chiefComplaint?: string;
+  vitals?: Record<string, unknown>;
   notes?: string;
-  tokenNo?: number;
+  startedAt?: string;
+  completedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -146,36 +144,40 @@ export interface QueueItem {
   checkInTime?: string;
 }
 
+export interface Vitals {
+  bloodPressureSystolic?: number | null;
+  bloodPressureDiastolic?: number | null;
+  heartRate?: number | null;
+  temperature?: number | null;
+  temperatureUnit: 'F' | 'C';
+  spo2?: number | null;
+  respiratoryRate?: number | null;
+  weight?: number | null;
+  height?: number | null;
+  bmi?: number | null;
+}
+
 export interface PrescriptionItem {
-  drugName: string;
+  medicineName: string;
   dosage: string;
   frequency: PrescriptionFrequency;
   duration: string;
-  route: string;
   instructions?: string;
+  quantity?: number;
 }
 
 export interface Prescription {
   _id: string;
   clinicId: string;
-  patientId: string;
-  doctorId: string;
+  patientId: string | { _id: string; fullName: string; patientUid?: string };
+  doctorId: string | { _id: string; fullName: string };
   appointmentId?: string;
-  patientName: string;
-  doctorName: string;
-  date: string;
   diagnosis: string;
-  complaints: string;
-  vitals?: {
-    bp?: string;
-    pulse?: string;
-    temp?: string;
-    weight?: string;
-    spo2?: string;
-  };
-  items: PrescriptionItem[];
+  notes?: string;
   advice?: string;
   followUpDate?: string;
+  items: PrescriptionItem[];
+  tiptapContent?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -193,30 +195,22 @@ export interface PrescriptionListItem {
 export interface Invoice {
   _id: string;
   clinicId: string;
-  patientId: string;
-  doctorId: string;
-  prescriptionId?: string;
-  invoiceNo: string;
-  patientName: string;
-  doctorName: string;
-  date: string;
+  patientId: string | { _id: string; fullName: string; patientUid?: string };
+  appointmentId?: string;
+  invoiceNumber: string;
   items: {
     description: string;
     quantity: number;
-    rate: number;
+    unitPrice: number;
     amount: number;
-    hsnCode?: string;
   }[];
   subtotal: number;
-  cgst: number;
-  sgst: number;
-  igst: number;
-  totalTax: number;
+  gstPercent: number;
+  gstAmount: number;
   discount: number;
-  grandTotal: number;
+  total: number;
   paymentMode: PaymentMode;
   paymentStatus: PaymentStatus;
-  gstin?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -224,11 +218,11 @@ export interface Invoice {
 
 export interface InvoiceListItem {
   _id: string;
-  invoiceNo: string;
+  invoiceNumber: string;
   patientName: string;
   patientUid: string;
   date: string;
-  grandTotal: number;
+  total: number;
   paymentStatus: PaymentStatus;
   paymentMode: PaymentMode;
 }
@@ -236,9 +230,51 @@ export interface InvoiceListItem {
 export interface PatientListItem {
   _id: string;
   patientUid: string;
-  name: string;
+  fullName: string;
   phone: string;
   gender: 'male' | 'female' | 'other';
-  dateOfBirth: string;
+  dateOfBirth?: string;
   lastVisit?: string;
+}
+
+// ────────────────────────────────────────────
+// API response wrappers
+// ────────────────────────────────────────────
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface QueueResponse {
+  queue: Appointment[];
+  stats: {
+    waiting: number;
+    inConsultation: number;
+    done: number;
+    cancelled: number;
+    noShow: number;
+    total: number;
+  };
+}
+
+// Auth response from server
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    fullName: string;
+    phone: string;
+    email?: string;
+    avatarUrl?: string;
+  };
+  clinics: ClinicListItem[];
+  activeClinicId: string;
+  isNewUser: boolean;
 }

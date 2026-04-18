@@ -15,8 +15,10 @@
   <!-- Right Panel -->
   <div class="right-panel flex-grow-1 d-flex align-items-center justify-content-center p-4">
     <div class="login-form w-100" style="max-width: 400px;">
-      <h3 class="fw-bold mb-1">Welcome back</h3>
-      <p class="text-secondary mb-4">Sign in with your mobile number</p>
+      @if (step() !== 'profile') {
+        <h3 class="fw-bold mb-1">Welcome back</h3>
+        <p class="text-secondary mb-4">Sign in with your mobile number</p>
+      }
 
       @if (error()) {
         <div class="alert alert-danger py-2 px-3 small">{{ error() }}</div>
@@ -76,10 +78,49 @@
         </button>
       }
 
-      <p class="text-center mt-4 mb-0 small text-secondary">
-        Don't have an account?
-        <a routerLink="/register" class="text-decoration-none fw-medium link-primary">Register</a>
-      </p>
+      @if (step() === 'profile') {
+        <h3 class="fw-bold mb-1">Complete Your Profile</h3>
+        <p class="text-secondary mb-4">We need a few details to get you started</p>
+        <div class="mb-3">
+          <label class="form-label small fw-medium" for="profileName">Full Name <span class="text-danger">*</span></label>
+          <input
+            pInputText
+            id="profileName"
+            type="text"
+            class="w-100"
+            placeholder="e.g. Dr. Meera Sharma"
+            [value]="profileName()"
+            (input)="onProfileNameInput($event)"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-medium" for="profileEmail">Email (optional)</label>
+          <input
+            pInputText
+            id="profileEmail"
+            type="email"
+            class="w-100"
+            placeholder="doctor@example.com"
+            [value]="profileEmail()"
+            (input)="onProfileEmailInput($event)"
+          />
+        </div>
+        <p-button
+          label="Continue"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          styleClass="w-100"
+          [loading]="loading()"
+          (onClick)="saveProfile()"
+        />
+      }
+
+      @if (step() !== 'profile') {
+        <p class="text-center mt-4 mb-0 small text-secondary">
+          Don't have an account?
+          <a routerLink="/register" class="text-decoration-none fw-medium link-primary">Register</a>
+        </p>
+      }
     </div>
   </div>
 </div>

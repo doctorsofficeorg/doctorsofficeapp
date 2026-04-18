@@ -61,7 +61,7 @@
 
   <!-- Members Table -->
   <div class="table-card">
-    <p-table [value]="members()" [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm p-datatable-striped" [paginator]="true" [rows]="10">
+    <p-table [value]="members()" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm p-datatable-striped" [paginator]="true" [rows]="10" [loading]="loading()">
       <ng-template #header>
         <tr>
           <th>Name</th>
@@ -69,7 +69,6 @@
           <th>Role</th>
           <th>Specialization</th>
           <th>Joined</th>
-          <th>Status</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -78,17 +77,17 @@
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="member-avatar" [ngClass]="'avatar-' + member.role">
-                {{ getInitials(member.name) }}
+                {{ getInitials(member.fullName) }}
               </div>
               <div>
-                <div class="fw-semibold">{{ member.name }}</div>
+                <div class="fw-semibold">{{ member.fullName }}</div>
                 @if (member.qualification) {
                   <div class="text-muted small">{{ member.qualification }}</div>
                 }
               </div>
             </div>
           </td>
-          <td>+91 {{ member.phone }}</td>
+          <td>+91 {{ formatPhone(member.phone) }}</td>
           <td>
             <p-tag [value]="getRoleLabel(member.role)" [severity]="getRoleSeverity(member.role)" />
           </td>
@@ -99,10 +98,7 @@
               <span class="text-muted">--</span>
             }
           </td>
-          <td>{{ formatDate(member.joinedDate) }}</td>
-          <td>
-            <p-tag [value]="getStatusLabel(member.status)" [severity]="getStatusSeverity(member.status)" />
-          </td>
+          <td>{{ formatDate(member.joinedAt) }}</td>
           <td>
             <div class="d-flex gap-1">
               <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" size="small" (onClick)="openEditDialog(member)" />
@@ -115,7 +111,7 @@
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td colspan="7" class="text-center py-4 text-muted">No team members found.</td>
+          <td colspan="6" class="text-center py-4 text-muted">No team members found.</td>
         </tr>
       </ng-template>
     </p-table>
@@ -167,8 +163,8 @@
     @if (editingMember(); as member) {
       <div class="pt-2">
         <div class="edit-member-info mb-3">
-          <div class="fw-semibold">{{ member.name }}</div>
-          <div class="text-muted small">+91 {{ member.phone }}</div>
+          <div class="fw-semibold">{{ member.fullName }}</div>
+          <div class="text-muted small">+91 {{ formatPhone(member.phone) }}</div>
         </div>
 
         <div class="mb-3">
@@ -177,51 +173,16 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold mb-2">Permissions</label>
-          <div class="permissions-grid">
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.viewPatients" />
-                <span>View Patients</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.editPatients" />
-                <span>Edit Patients</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.viewBilling" />
-                <span>View Billing</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.editBilling" />
-                <span>Edit Billing</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.viewPrescriptions" />
-                <span>View Prescriptions</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.editPrescriptions" />
-                <span>Edit Prescriptions</span>
-              </label>
-            </div>
-            <div class="permission-item">
-              <label class="permission-label">
-                <input type="checkbox" [(ngModel)]="editForm.permissions.manageTeam" />
-                <span>Manage Team</span>
-              </label>
-            </div>
-          </div>
+          <label class="form-label">Qualification</label>
+          <input type="text" pInputText class="w-100" [(ngModel)]="editForm.qualification" placeholder="e.g. MBBS, MD" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Specialization</label>
+          <input type="text" pInputText class="w-100" [(ngModel)]="editForm.specialization" placeholder="e.g. Cardiologist" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Registration Number</label>
+          <input type="text" pInputText class="w-100" [(ngModel)]="editForm.registrationNo" placeholder="e.g. KMC-2020-XXXXX" />
         </div>
       </div>
     }

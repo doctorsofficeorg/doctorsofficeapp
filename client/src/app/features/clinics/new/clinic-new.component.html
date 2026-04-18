@@ -1,0 +1,107 @@
+<section class="onboarding-shell bg-aurora">
+  <header class="onboarding-top">
+    <button class="back-btn" (click)="cancel()" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>{{ hasExistingClinics() ? 'Back' : 'Sign out' }}</span>
+    </button>
+    <span class="step-label">Create clinic</span>
+    <span class="header-spacer"></span>
+  </header>
+
+  <div class="onboarding-body">
+    <div class="intro">
+      <span class="eyebrow">Onboarding</span>
+      <h1>Tell us about your clinic</h1>
+      <p>We'll use these details on prescriptions, invoices, and across the app. You can change anything later from Settings.</p>
+    </div>
+
+    <form class="form-card" (submit)="$event.preventDefault(); submit()" novalidate>
+      <section class="form-section">
+        <h3 class="section-title">Basics</h3>
+        <div class="field-grid">
+          <label class="field field-wide">
+            <span class="label">Clinic name</span>
+            <input pInputText type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" placeholder="e.g. Mehra Family Clinic" required />
+          </label>
+          <label class="field">
+            <span class="label">Phone</span>
+            <input pInputText type="tel" [ngModel]="phone()" (ngModelChange)="phone.set($event)" name="phone" placeholder="9876543210" inputmode="numeric" required />
+          </label>
+          <label class="field">
+            <span class="label">Email</span>
+            <input pInputText type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" placeholder="clinic@example.com" required />
+          </label>
+          <label class="field">
+            <span class="label">GSTIN <small>(optional)</small></span>
+            <input pInputText type="text" [ngModel]="gstin()" (ngModelChange)="gstin.set($event)" name="gstin" placeholder="22AAAAA0000A1Z5" />
+          </label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h3 class="section-title">Location</h3>
+        <div class="field-grid">
+          <label class="field field-wide">
+            <span class="label">Address</span>
+            <input pInputText type="text" [ngModel]="address()" (ngModelChange)="address.set($event)" name="address" placeholder="Building, street" required />
+          </label>
+          <label class="field">
+            <span class="label">City</span>
+            <input pInputText type="text" [ngModel]="city()" (ngModelChange)="city.set($event)" name="city" placeholder="e.g. Bengaluru" required />
+          </label>
+          <label class="field">
+            <span class="label">State</span>
+            <p-select [options]="stateOptions" [ngModel]="state()" (ngModelChange)="state.set($event)" name="state" placeholder="Select a state" optionLabel="label" optionValue="value" [filter]="true" appendTo="body" styleClass="w-100" />
+          </label>
+          <label class="field">
+            <span class="label">Pincode</span>
+            <input pInputText type="text" [ngModel]="pincode()" (ngModelChange)="pincode.set($event)" name="pincode" placeholder="560001" inputmode="numeric" maxlength="6" required />
+          </label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h3 class="section-title">Branding</h3>
+        <p class="section-help">These drive the look and feel for your clinic across the app and printed documents.</p>
+        <div class="field-grid">
+          <label class="field color-field">
+            <span class="label">Primary color</span>
+            <div class="color-row">
+              <input type="color" [value]="primaryColor()" (input)="primaryColor.set($any($event.target).value)" aria-label="Primary color" />
+              <input pInputText type="text" [ngModel]="primaryColor()" (ngModelChange)="primaryColor.set($event)" name="primaryColor" />
+            </div>
+          </label>
+          <label class="field color-field">
+            <span class="label">Secondary color</span>
+            <div class="color-row">
+              <input type="color" [value]="secondaryColor()" (input)="secondaryColor.set($any($event.target).value)" aria-label="Secondary color" />
+              <input pInputText type="text" [ngModel]="secondaryColor()" (ngModelChange)="secondaryColor.set($event)" name="secondaryColor" />
+            </div>
+          </label>
+          <label class="field color-field">
+            <span class="label">Accent color</span>
+            <div class="color-row">
+              <input type="color" [value]="accentColor()" (input)="accentColor.set($any($event.target).value)" aria-label="Accent color" />
+              <input pInputText type="text" [ngModel]="accentColor()" (ngModelChange)="accentColor.set($event)" name="accentColor" />
+            </div>
+          </label>
+          <label class="field">
+            <span class="label">Theme</span>
+            <p-selectButton [options]="themeOptions" [ngModel]="theme()" (ngModelChange)="theme.set($event)" name="theme" optionLabel="label" optionValue="value" [allowEmpty]="false" />
+          </label>
+        </div>
+      </section>
+
+      @if (error()) {
+        <div class="form-error">{{ error() }}</div>
+      }
+
+      <div class="form-actions">
+        <p-button type="button" severity="secondary" [outlined]="true" label="Cancel" (onClick)="cancel()" />
+        <p-button type="submit" label="Create clinic" icon="pi pi-check" [loading]="loading()" [disabled]="!canSubmit() || loading()" (onClick)="submit()" />
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -12,7 +12,7 @@ import { SelectModule } from 'primeng/select';
   imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, CardModule, SelectModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class SettingsComponent {
   saving = signal(false);

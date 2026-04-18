@@ -8,7 +8,13 @@ export async function createPatient(req: Request, res: Response): Promise<void> 
     res.status(201).json(patient);
   } catch (error: any) {
     if (error.code === 11000) {
-      res.status(409).json({ error: "Patient with this UID already exists" });
+      console.error("[Patient] duplicate key:", {
+        keyPattern: error.keyPattern,
+        keyValue: error.keyValue,
+        message: error.message,
+      });
+      const field = Object.keys(error.keyPattern ?? {})[0] ?? "unknown field";
+      res.status(409).json({ error: `Duplicate ${field}` });
       return;
     }
     console.error("[Patient] create error:", error);
