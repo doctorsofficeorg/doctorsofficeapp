@@ -1,0 +1,106 @@
+@use '../../mixins' as dods;
+
+:host { display: block; }
+
+.dods-sf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dods-space-5);
+
+  &__head { }
+
+  &__title {
+    margin: 0 0 var(--dods-space-1);
+    font-size: var(--dods-font-size-2xl);
+    font-weight: var(--dods-font-weight-bold);
+    color: var(--dods-text-primary);
+    letter-spacing: var(--dods-letter-spacing-tight);
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: var(--dods-font-size-md);
+    color: var(--dods-text-muted);
+    max-width: 680px;
+    line-height: var(--dods-line-height-snug);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: var(--dods-space-5);
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dods-space-3);
+  }
+
+  &__preview-surface {
+    @include dods.dods-glass-subtle;
+    padding: var(--dods-space-8);
+    border-radius: var(--dods-radius-xl);
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--dods-space-3);
+
+    background-image:
+      linear-gradient(45deg, rgba(148, 163, 184, 0.06) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(148, 163, 184, 0.06) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(148, 163, 184, 0.06) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.06) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  }
+
+  &__code {
+    @include dods.dods-glass-subtle;
+    border-radius: var(--dods-radius-md);
+    overflow: hidden;
+
+    summary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--dods-space-2);
+      padding: var(--dods-space-2) var(--dods-space-3);
+      font-size: var(--dods-font-size-sm);
+      font-weight: var(--dods-font-weight-medium);
+      color: var(--dods-text-secondary);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker { display: none; }
+
+      i { font-size: 0.9em; }
+    }
+
+    pre {
+      margin: 0;
+      padding: var(--dods-space-3);
+      font-family: var(--dods-font-family-mono);
+      font-size: var(--dods-font-size-xs);
+      color: var(--dods-text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--dods-surface-glass-inset);
+    }
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dods-space-3);
+
+    @media (max-width: 1024px) {
+      order: -1;
+    }
+  }
+}

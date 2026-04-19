@@ -1,0 +1,35 @@
+<article class="dods-sf">
+  <header class="dods-sf__head">
+    <h1 class="dods-sf__title">{{ title() }}</h1>
+    @if (description()) {
+      <p class="dods-sf__desc">{{ description() }}</p>
+    }
+  </header>
+
+  <div class="dods-sf__grid">
+    <section class="dods-sf__preview">
+      <div class="dods-sf__preview-surface">
+        <ng-content select="[dods-story-preview]" />
+      </div>
+      @if (snippet()) {
+        <details class="dods-sf__code">
+          <summary>
+            <i class="pi pi-code" aria-hidden="true"></i>
+            Code snippet
+          </summary>
+          <pre><code>{{ snippet() }}</code></pre>
+        </details>
+      }
+    </section>
+
+    <aside class="dods-sf__panel">
+      <dods-controls
+        [controls]="controls()"
+        [state]="state()"
+        (changed)="changed.emit($event)"
+        (reset)="reset.emit()"
+      />
+      <ng-content select="[dods-story-variants]" />
+    </aside>
+  </div>
+</article>

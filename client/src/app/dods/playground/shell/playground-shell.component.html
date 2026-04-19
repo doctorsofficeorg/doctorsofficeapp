@@ -1,0 +1,60 @@
+<div class="dods-pg" [class.dods-pg--sidebar-closed]="!sidebarOpen()">
+  <aside class="dods-pg__sidebar" aria-label="Component navigation">
+    <header class="dods-pg__sidebar-head">
+      <a class="dods-pg__brand" routerLink="/dods">
+        <span class="dods-pg__brand-mark" aria-hidden="true"></span>
+        <span class="dods-pg__brand-text">DODS<small>Playground</small></span>
+      </a>
+    </header>
+
+    <nav class="dods-pg__nav">
+      @for (group of groupNames; track group) {
+        <div class="dods-pg__group">
+          <h3 class="dods-pg__group-title">{{ group }}</h3>
+          <ul class="dods-pg__nav-list">
+            @for (item of groups[group]; track item.id) {
+              <li>
+                <a
+                  class="dods-pg__nav-link"
+                  [routerLink]="['/dods', item.id]"
+                  routerLinkActive="dods-pg__nav-link--active"
+                >
+                  @if (item.icon) {
+                    <i [class]="item.icon + ' dods-pg__nav-icon'" aria-hidden="true"></i>
+                  }
+                  <span>{{ item.name }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <main class="dods-pg__main">
+    <header class="dods-pg__topbar">
+      <button
+        type="button"
+        class="dods-pg__icon-btn"
+        aria-label="Toggle sidebar"
+        (click)="toggleSidebar()"
+      >
+        <i class="pi pi-bars" aria-hidden="true"></i>
+      </button>
+      <div class="dods-pg__topbar-spacer"></div>
+      <dods-button
+        variant="secondary"
+        size="sm"
+        [leadingIcon]="theme() === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
+        (pressed)="toggleTheme()"
+      >
+        {{ theme() === 'dark' ? 'Light' : 'Dark' }}
+      </dods-button>
+    </header>
+
+    <section class="dods-pg__content">
+      <router-outlet />
+    </section>
+  </main>
+</div>

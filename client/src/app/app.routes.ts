@@ -96,5 +96,10 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'dods',
+    loadChildren: () =>
+      import('./dods/playground/playground.routes').then(m => m.DODS_PLAYGROUND_ROUTES),
+  },
   { path: '**', redirectTo: '' },
 ];

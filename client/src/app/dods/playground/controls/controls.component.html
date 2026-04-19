@@ -1,0 +1,83 @@
+<div class="dods-pg-controls">
+  <header class="dods-pg-controls__head">
+    <span class="dods-pg-controls__title">Controls</span>
+    <button
+      type="button"
+      class="dods-pg-controls__reset"
+      (click)="reset.emit()"
+    >
+      <i class="pi pi-refresh" aria-hidden="true"></i>
+      Reset
+    </button>
+  </header>
+  @if (rows().length === 0) {
+    <p class="dods-pg-controls__empty">No controls for this story.</p>
+  } @else {
+    <ul class="dods-pg-controls__list">
+      @for (c of rows(); track c.key) {
+        <li class="dods-pg-controls__row">
+          <label class="dods-pg-controls__label">
+            {{ c.label }}
+            @if (c.description) {
+              <span class="dods-pg-controls__desc">{{ c.description }}</span>
+            }
+          </label>
+          <div class="dods-pg-controls__input">
+            @switch (c.type) {
+              @case ('boolean') {
+                <label class="dods-pg-controls__switch">
+                  <input
+                    type="checkbox"
+                    [checked]="!!c.value"
+                    (change)="onBool(c.key, $event)"
+                  />
+                  <span class="dods-pg-controls__track">
+                    <span class="dods-pg-controls__thumb"></span>
+                  </span>
+                </label>
+              }
+              @case ('number') {
+                <input
+                  type="number"
+                  class="dods-pg-controls__textbox"
+                  [value]="stringify(c.value)"
+                  [min]="c.min ?? null"
+                  [max]="c.max ?? null"
+                  [step]="c.step ?? 1"
+                  (input)="onNumber(c.key, $event)"
+                />
+              }
+              @case ('select') {
+                <select
+                  class="dods-pg-controls__select"
+                  [value]="stringify(c.value)"
+                  (change)="onSelect(c.key, $event)"
+                >
+                  @for (opt of c.options ?? []; track opt.value) {
+                    <option [value]="stringify(opt.value)">{{ opt.label }}</option>
+                  }
+                </select>
+              }
+              @case ('color') {
+                <input
+                  type="color"
+                  class="dods-pg-controls__color"
+                  [value]="stringify(c.value)"
+                  (input)="onColor(c.key, $event)"
+                />
+              }
+              @default {
+                <input
+                  type="text"
+                  class="dods-pg-controls__textbox"
+                  [value]="stringify(c.value)"
+                  (input)="onText(c.key, $event)"
+                />
+              }
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>
