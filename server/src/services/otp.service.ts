@@ -1,5 +1,8 @@
 import { config } from "../config/index.js";
-import { cacheGet, cacheSet, cacheDel } from "./cache.service.js";
+import { cacheGet, cacheSet, cacheDel, getRedisClient } from "./cache.service.js";
+
+/** In-memory OTP store — used as fallback when Redis is unavailable */
+const memoryStore = new Map<string, { otp: string; expiresAt: number }>();
 
 const MSG91_BASE = "https://control.msg91.com/api/v5/otp";
 
@@ -14,6 +17,35 @@ function otpKey(phone: string): string {
 /** Strip the + prefix — MSG91 expects "919876543210" not "+919876543210" */
 function toMsg91Mobile(phone: string): string {
   return phone.replace(/^\+/, "");
+}
+
+async function storeOtp(key: string, otp: string, ttl: number): Promise<void> {
+  if (getRedisClient()) {
+    await cacheSet(key, otp, ttl);
+  } else {
+    memoryStore.set(key, { otp, expiresAt: Date.now() + ttl * 1000 });
+  }
+}
+
+async function retrieveOtp(key: string): Promise<string | null> {
+  if (getRedisClient()) {
+    return cacheGet(key);
+  }
+  const entry = memoryStore.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    memoryStore.delete(key);
+    return null;
+  }
+  return entry.otp;
+}
+
+async function deleteOtp(key: string): Promise<void> {
+  if (getRedisClient()) {
+    await cacheDel(key);
+  } else {
+    memoryStore.delete(key);
+  }
 }
 
 function useMsg91(): boolean {
@@ -49,9 +81,9 @@ export async function sendOtp(phone: string): Promise<{ message: string; expires
     throw new Error(data.message || "Failed to send OTP via MSG91");
   }
 
-  // Dev mode — generate locally, store in Redis, return OTP in response
+  // Dev mode — generate locally, store in Redis (or memory fallback), return OTP in response
   const otp = generateOtp();
-  await cacheSet(otpKey(phone), otp, config.otpExpiry);
+  await storeOtp(otpKey(phone), otp, config.otpExpiry);
 
   console.log(`[OTP] ${phone}: ${otp}`);
   return { message: "OTP sent", expiresIn: config.otpExpiry, otp };
@@ -75,19 +107,16 @@ export async function verifyOtp(phone: string, otp: string): Promise<boolean> {
     return data.type === "success";
   }
 
-  // Dev mode — verify from Redis
+  // Dev mode — verify from Redis (or memory fallback)
   const key = otpKey(phone);
-  const storedOtp = await cacheGet(key);
-  if (!storedOtp) {
+  const storedOtp = await retrieveOtp(key);
+
+  if (!storedOtp || storedOtp !== otp) {
     return false;
   }
 
-  if (storedOtp !== otp) {
-    return false;
-  }
-
-  // OTP is valid — delete it so it can't be reused
-  await cacheDel(key);
+  // OTP valid — delete so it can't be reused
+  await deleteOtp(key);
   return true;
 }
 

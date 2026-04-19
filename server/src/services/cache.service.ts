@@ -8,6 +8,11 @@ export function getRedisClient(): Redis | null {
 }
 
 export function initRedis(): Promise<Redis | null> {
+  if (!config.redisUrl) {
+    console.log("[Redis] No REDIS_URL configured, running without cache");
+    return Promise.resolve(null);
+  }
+
   return new Promise((resolve) => {
     const client = new Redis({
       host: config.redisHost,
