@@ -1,0 +1,126 @@
+@use '../../mixins' as dods;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.dods-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dods-space-1);
+
+  &__field {
+    @include dods.dods-glass-inset;
+    display: flex;
+    align-items: center;
+    gap: var(--dods-space-2);
+    padding: 0 var(--dods-space-3);
+    border-radius: var(--dods-radius-md);
+    min-height: 44px;
+    color: var(--dods-text-primary);
+    @include dods.dods-spring-transition(box-shadow, border-color, background-color);
+  }
+
+  &--sm &__field { min-height: 36px; border-radius: var(--dods-radius-sm); }
+  &--lg &__field { min-height: 52px; border-radius: var(--dods-radius-lg); padding: 0 var(--dods-space-4); }
+
+  &__control-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: inherit;
+  }
+
+  &--has-float &__control-wrap {
+    padding-top: 14px;
+  }
+
+  &__label {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: left center;
+    color: var(--dods-text-muted);
+    font-size: var(--dods-font-size-base);
+    pointer-events: none;
+    transition:
+      transform var(--dods-duration-base) var(--dods-ease-spring-soft),
+      color var(--dods-duration-base) var(--dods-ease-standard),
+      font-size var(--dods-duration-base) var(--dods-ease-standard);
+
+    &--up {
+      transform: translateY(calc(-50% - 12px)) scale(0.82);
+      color: var(--dods-text-secondary);
+      font-weight: var(--dods-font-weight-medium);
+    }
+  }
+
+  &__required {
+    color: var(--dods-feedback-danger);
+    margin-left: 2px;
+  }
+
+  &__control {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    min-width: 0;
+
+    &::placeholder {
+      color: var(--dods-text-muted);
+      opacity: 0.7;
+    }
+  }
+
+  &__icon {
+    color: var(--dods-text-muted);
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__affix {
+    color: var(--dods-text-muted);
+    font-size: var(--dods-font-size-sm);
+    font-weight: var(--dods-font-weight-medium);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  &--focused &__field {
+    @include dods.dods-focus-ring;
+    border-color: var(--dods-brand-primary);
+  }
+
+  &--error &__field {
+    @include dods.dods-focus-ring-danger;
+    border-color: var(--dods-feedback-danger);
+  }
+
+  &--disabled &__field {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--disabled &__control {
+    cursor: not-allowed;
+  }
+
+  &__message {
+    margin: 0;
+    padding: 0 var(--dods-space-1);
+    font-size: var(--dods-font-size-xs);
+
+    &--hint  { color: var(--dods-text-muted); }
+    &--error { color: var(--dods-feedback-danger); font-weight: var(--dods-font-weight-medium); }
+  }
+}

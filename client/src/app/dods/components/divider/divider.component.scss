@@ -1,0 +1,32 @@
+:host.dods-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--dods-space-2);
+
+  &--horizontal {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  &--vertical {
+    flex-direction: column;
+    height: 100%;
+    min-height: 24px;
+  }
+
+  &__line {
+    flex: 1;
+    background: var(--dods-border-subtle);
+  }
+
+  &--horizontal &__line { height: 1px; }
+  &--vertical   &__line { width: 1px; }
+
+  &__label {
+    font-size: var(--dods-font-size-xs);
+    color: var(--dods-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: var(--dods-font-weight-medium);
+  }
+}

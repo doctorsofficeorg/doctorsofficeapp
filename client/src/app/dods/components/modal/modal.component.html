@@ -1,0 +1,34 @@
+@if (open()) {
+  <div class="dods-modal__backdrop" (click)="onBackdropClick()" role="presentation">
+    <div
+      [class]="panelClass()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title() ?? 'Dialog'"
+      (click)="onPanelClick($event)"
+    >
+      @if (title() || description() || showClose()) {
+        <div class="dods-modal__header">
+          <div class="dods-modal__titles">
+            @if (title()) { <h2 class="dods-modal__title">{{ title() }}</h2> }
+            @if (description()) { <p class="dods-modal__desc">{{ description() }}</p> }
+          </div>
+          @if (showClose()) {
+            <button
+              type="button"
+              class="dods-modal__close"
+              aria-label="Close dialog"
+              (click)="close()"
+            >
+              <i class="pi pi-times" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      }
+      <div class="dods-modal__body">
+        <ng-content />
+      </div>
+      <ng-content select="[dods-modal-footer]" />
+    </div>
+  </div>
+}

@@ -1,0 +1,77 @@
+@use '../../mixins' as dods;
+
+:host { display: inline-block; }
+
+.dods-switch {
+  --_track-w: 44px;
+  --_track-h: 26px;
+  --_thumb:   22px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dods-space-2);
+  cursor: pointer;
+
+  &--sm { --_track-w: 36px; --_track-h: 22px; --_thumb: 18px; }
+  &--md { --_track-w: 44px; --_track-h: 26px; --_thumb: 22px; }
+  &--lg { --_track-w: 54px; --_track-h: 32px; --_thumb: 28px; }
+
+  &__track {
+    position: relative;
+    display: inline-block;
+    width: var(--_track-w);
+    height: var(--_track-h);
+    border-radius: var(--dods-radius-pill);
+    background: var(--dods-surface-glass-inset);
+    border: 1px solid var(--dods-border-strong);
+    padding: 0;
+    cursor: pointer;
+    @include dods.dods-spring-transition(background-color, border-color, box-shadow);
+
+    &:focus-visible { @include dods.dods-focus-ring; }
+    &:disabled { cursor: not-allowed; }
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    width: var(--_thumb);
+    height: var(--_thumb);
+    border-radius: 50%;
+    background: var(--dods-color-neutral-0);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.15),
+      0 4px 10px rgba(15, 23, 42, 0.20);
+    transform: translateY(-50%);
+    transition: left var(--dods-duration-base) var(--dods-ease-spring);
+  }
+
+  &--checked &__track {
+    background: var(--dods-brand-primary);
+    border-color: var(--dods-brand-primary);
+  }
+
+  &--checked &__thumb {
+    left: calc(var(--_track-w) - var(--_thumb) - 2px);
+  }
+
+  &--disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &__text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-weight: var(--dods-font-weight-medium);
+    font-size: var(--dods-font-size-sm);
+    color: var(--dods-text-primary);
+  }
+
+  &__desc {
+    font-size: var(--dods-font-size-xs);
+    color: var(--dods-text-muted);
+  }
+}

@@ -1,0 +1,22 @@
+@use '../../mixins' as dods;
+
+:host.dods-tooltip {
+  @include dods.dods-glass-elevated;
+  position: absolute;
+  z-index: 1100;
+  padding: 6px var(--dods-space-2);
+  max-width: 240px;
+  border-radius: var(--dods-radius-sm);
+  font-size: var(--dods-font-size-xs);
+  font-weight: var(--dods-font-weight-medium);
+  color: var(--dods-text-primary);
+  pointer-events: none;
+  animation: dods-tooltip-in var(--dods-duration-fast) var(--dods-ease-spring-soft);
+  white-space: normal;
+  line-height: var(--dods-line-height-snug);
+}
+
+@keyframes dods-tooltip-in {
+  0%   { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}

@@ -1,0 +1,40 @@
+// DODS — Typography tokens
+
+:root {
+  --dods-font-family-base:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --dods-font-family-display: var(--dods-font-family-base);
+  --dods-font-family-mono:
+    'SF Mono', 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace;
+
+  // Sizes
+  --dods-font-size-2xs:  10px;
+  --dods-font-size-xs:   12px;
+  --dods-font-size-sm:   13px;
+  --dods-font-size-base: 14px;
+  --dods-font-size-md:   15px;
+  --dods-font-size-lg:   17px;
+  --dods-font-size-xl:   20px;
+  --dods-font-size-2xl:  24px;
+  --dods-font-size-3xl:  30px;
+  --dods-font-size-4xl:  36px;
+  --dods-font-size-5xl:  48px;
+
+  // Weights
+  --dods-font-weight-regular:  400;
+  --dods-font-weight-medium:   500;
+  --dods-font-weight-semibold: 600;
+  --dods-font-weight-bold:     700;
+
+  // Line heights
+  --dods-line-height-tight:  1.2;
+  --dods-line-height-snug:   1.35;
+  --dods-line-height-normal: 1.5;
+  --dods-line-height-loose:  1.7;
+
+  // Letter spacing
+  --dods-letter-spacing-tight:  -0.015em;
+  --dods-letter-spacing-normal: 0;
+  --dods-letter-spacing-wide:   0.02em;
+}

@@ -1,0 +1,72 @@
+// DODS — Glass surface mixins.
+// Every DODS component uses these to get consistent glass aesthetics and
+// dark-mode behaviour for free.
+
+@mixin _glass-base($bg, $border, $blur, $saturate, $highlight, $shadow) {
+  background-color: $bg;
+  -webkit-backdrop-filter: blur($blur) saturate($saturate);
+          backdrop-filter: blur($blur) saturate($saturate);
+  border: 1px solid $border;
+  box-shadow: $highlight, $shadow;
+}
+
+// Lightest — for subtle fills that sit on busy backgrounds.
+@mixin dods-glass-subtle {
+  @include _glass-base(
+    var(--dods-surface-glass-subtle),
+    var(--dods-border-glass-subtle),
+    var(--dods-blur-sm),
+    var(--dods-saturate-subtle),
+    var(--dods-highlight-glass-subtle),
+    var(--dods-shadow-glass-subtle)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--dods-surface-glass-fallback);
+  }
+}
+
+// Default — for cards and most surfaces.
+@mixin dods-glass {
+  @include _glass-base(
+    var(--dods-surface-glass),
+    var(--dods-border-glass),
+    var(--dods-blur-md),
+    var(--dods-saturate-standard),
+    var(--dods-highlight-glass),
+    var(--dods-shadow-glass)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--dods-surface-glass-fallback);
+  }
+}
+
+// Elevated — for popovers, modals, sticky bars.
+@mixin dods-glass-elevated {
+  @include _glass-base(
+    var(--dods-surface-glass-elevated),
+    var(--dods-border-glass-elevated),
+    var(--dods-blur-lg),
+    var(--dods-saturate-vivid),
+    var(--dods-highlight-glass-elevated),
+    var(--dods-shadow-glass-elevated)
+  );
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--dods-surface-glass-fallback);
+  }
+}
+
+// Inset — for inputs, wells, pressed states.
+@mixin dods-glass-inset {
+  background-color: var(--dods-surface-glass-inset);
+  -webkit-backdrop-filter: blur(var(--dods-blur-sm)) saturate(var(--dods-saturate-subtle));
+          backdrop-filter: blur(var(--dods-blur-sm)) saturate(var(--dods-saturate-subtle));
+  border: 1px solid var(--dods-border-glass-subtle);
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.10);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: var(--dods-surface-glass-fallback);
+  }
+}

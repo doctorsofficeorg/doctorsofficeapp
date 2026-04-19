@@ -1,0 +1,112 @@
+@use '../../mixins' as dods;
+
+:host.dods-tabs {
+  display: block;
+
+  &__list {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dods-space-2);
+    padding: 6px var(--dods-space-3);
+    border: none;
+    background: transparent;
+    color: var(--dods-text-secondary);
+    font: inherit;
+    font-size: var(--dods-font-size-sm);
+    font-weight: var(--dods-font-weight-medium);
+    cursor: pointer;
+    border-radius: var(--dods-radius-sm);
+    @include dods.dods-spring-transition(background-color, color, box-shadow);
+
+    &:hover:not(:disabled):not(.dods-tabs__tab--active) {
+      color: var(--dods-text-primary);
+      background: var(--dods-surface-glass-subtle);
+    }
+
+    &:focus-visible { @include dods.dods-focus-ring; }
+
+    &--disabled, &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  &__icon { font-size: 0.9em; }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: var(--dods-radius-pill);
+    background: var(--dods-tint-primary-bg);
+    color: var(--dods-tint-primary-text);
+    font-size: var(--dods-font-size-2xs);
+    font-weight: var(--dods-font-weight-semibold);
+  }
+
+  &--full &__list { width: 100%; display: flex; }
+  &--full &__tab { flex: 1; justify-content: center; }
+
+  // ── Variants ──
+  &--segmented &__list {
+    @include dods.dods-glass-inset;
+    padding: 3px;
+    border-radius: var(--dods-radius-md);
+  }
+
+  &--segmented &__tab--active {
+    background: var(--dods-surface-solid);
+    color: var(--dods-text-primary);
+    box-shadow:
+      var(--dods-highlight-glass-subtle),
+      var(--dods-shadow-glass-subtle);
+  }
+
+  &--underline &__list {
+    gap: var(--dods-space-2);
+    border-bottom: 1px solid var(--dods-border-subtle);
+  }
+
+  &--underline &__tab {
+    border-radius: 0;
+    padding: var(--dods-space-2) var(--dods-space-3);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: var(--dods-space-3);
+      right: var(--dods-space-3);
+      bottom: -1px;
+      height: 2px;
+      background: transparent;
+      border-radius: 2px 2px 0 0;
+      transition: background-color var(--dods-duration-base) var(--dods-ease-standard);
+    }
+
+    &--active {
+      color: var(--dods-brand-primary);
+      &::after { background: var(--dods-brand-primary); }
+    }
+  }
+
+  &--pill &__tab--active {
+    background: var(--dods-brand-primary);
+    color: var(--dods-brand-primary-contrast);
+    border-radius: var(--dods-radius-pill);
+  }
+
+  &--pill &__tab {
+    padding: 6px var(--dods-space-4);
+    border-radius: var(--dods-radius-pill);
+  }
+}

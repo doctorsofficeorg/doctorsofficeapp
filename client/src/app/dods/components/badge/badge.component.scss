@@ -1,0 +1,70 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dods-space-1);
+  padding: 2px var(--dods-space-2);
+  border-radius: var(--dods-radius-pill);
+  font-size: var(--dods-font-size-xs);
+  font-weight: var(--dods-font-weight-semibold);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.dods-badge {
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    font-size: 0.85em;
+  }
+}
+
+// ── Size ──
+:host.dods-badge--sm {
+  padding: 1px 6px;
+  font-size: var(--dods-font-size-2xs);
+}
+
+:host.dods-badge--md {
+  padding: 2px var(--dods-space-2);
+  font-size: var(--dods-font-size-xs);
+}
+
+// ── Soft (default tint) ──
+:host.dods-badge--soft {
+  &.dods-badge--neutral { background: var(--dods-tint-neutral-bg); color: var(--dods-tint-neutral-text); }
+  &.dods-badge--primary { background: var(--dods-tint-primary-bg); color: var(--dods-tint-primary-text); }
+  &.dods-badge--success { background: var(--dods-tint-success-bg); color: var(--dods-tint-success-text); }
+  &.dods-badge--warning { background: var(--dods-tint-warning-bg); color: var(--dods-tint-warning-text); }
+  &.dods-badge--danger  { background: var(--dods-tint-danger-bg);  color: var(--dods-tint-danger-text); }
+  &.dods-badge--info    { background: var(--dods-tint-info-bg);    color: var(--dods-tint-info-text); }
+}
+
+// ── Solid ──
+:host.dods-badge--solid {
+  color: #ffffff;
+  &.dods-badge--neutral { background: var(--dods-color-neutral-700); }
+  &.dods-badge--primary { background: var(--dods-brand-primary); color: var(--dods-brand-primary-contrast); }
+  &.dods-badge--success { background: var(--dods-feedback-success); }
+  &.dods-badge--warning { background: var(--dods-feedback-warning); }
+  &.dods-badge--danger  { background: var(--dods-feedback-danger); }
+  &.dods-badge--info    { background: var(--dods-feedback-info); }
+}
+
+// ── Outline ──
+:host.dods-badge--outline {
+  background: transparent;
+  &.dods-badge--neutral { color: var(--dods-text-primary);     border-color: var(--dods-border-strong); }
+  &.dods-badge--primary { color: var(--dods-brand-primary);    border-color: var(--dods-brand-primary); }
+  &.dods-badge--success { color: var(--dods-feedback-success); border-color: var(--dods-feedback-success); }
+  &.dods-badge--warning { color: var(--dods-feedback-warning); border-color: var(--dods-feedback-warning); }
+  &.dods-badge--danger  { color: var(--dods-feedback-danger);  border-color: var(--dods-feedback-danger); }
+  &.dods-badge--info    { color: var(--dods-feedback-info);    border-color: var(--dods-feedback-info); }
+}

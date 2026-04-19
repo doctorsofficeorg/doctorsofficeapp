@@ -1,0 +1,14 @@
+// DODS — Backdrop blur levels
+
+:root {
+  --dods-blur-xs: 4px;
+  --dods-blur-sm: 8px;
+  --dods-blur-md: 16px;
+  --dods-blur-lg: 24px;
+  --dods-blur-xl: 40px;
+
+  // Saturation boost paired with backdrop-filter
+  --dods-saturate-subtle:   140%;
+  --dods-saturate-standard: 150%;
+  --dods-saturate-vivid:    170%;
+}

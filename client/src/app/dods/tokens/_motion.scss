@@ -1,0 +1,22 @@
+// DODS — Motion tokens
+
+:root {
+  // Durations
+  --dods-duration-instant: 80ms;
+  --dods-duration-fast:    120ms;
+  --dods-duration-base:    180ms;
+  --dods-duration-slow:    260ms;
+  --dods-duration-slower:  400ms;
+
+  // Easings
+  --dods-ease-linear:   linear;
+  --dods-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dods-ease-out:      cubic-bezier(0.0, 0, 0.2, 1);
+  --dods-ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --dods-ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
+
+  // iOS-like spring (approximated via cubic-bezier)
+  --dods-ease-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dods-ease-spring-soft:  cubic-bezier(0.22, 1, 0.36, 1);
+  --dods-ease-spring-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+}

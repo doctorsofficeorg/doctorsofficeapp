@@ -1,0 +1,26 @@
+<div class="dods-toast__stack" role="region" aria-label="Notifications" aria-live="polite">
+  @for (t of toasts(); track t.id) {
+    <div
+      class="dods-toast"
+      [class.dods-toast--success]="t.severity === 'success'"
+      [class.dods-toast--info]="t.severity === 'info'"
+      [class.dods-toast--warning]="t.severity === 'warning'"
+      [class.dods-toast--danger]="t.severity === 'danger'"
+      role="status"
+    >
+      <i [class]="iconFor(t) + ' dods-toast__icon'" aria-hidden="true"></i>
+      <div class="dods-toast__body">
+        @if (t.title) { <p class="dods-toast__title">{{ t.title }}</p> }
+        <p class="dods-toast__message">{{ t.message }}</p>
+      </div>
+      <button
+        type="button"
+        class="dods-toast__close"
+        aria-label="Dismiss notification"
+        (click)="dismiss(t)"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

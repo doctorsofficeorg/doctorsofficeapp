@@ -9,6 +9,9 @@
 @use "./app/styles/backgrounds";
 @use "./app/styles/primeng-aura-overrides";
 
+// DODS — Doctors Office Design System.
+@use "./app/dods/dods";
+
 // Declare cascade-layer order. Must match `cssLayer.order` in providePrimeNG()
 // (app.config.ts). Later layers override earlier ones; unlayered styles beat
 // all layered styles, so we wrap Bootstrap into the `base` layer below.

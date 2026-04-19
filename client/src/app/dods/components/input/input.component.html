@@ -1,0 +1,67 @@
+@let _label = label();
+@let _error = error();
+@let _hint = hint();
+@let _prefix = prefix();
+@let _suffix = suffix();
+@let _leadingIcon = leadingIcon();
+@let _trailingIcon = trailingIcon();
+<div
+  class="dods-input"
+  [class.dods-input--focused]="focused()"
+  [class.dods-input--error]="!!_error"
+  [class.dods-input--disabled]="disabled()"
+  [class.dods-input--sm]="size() === 'sm'"
+  [class.dods-input--md]="size() === 'md'"
+  [class.dods-input--lg]="size() === 'lg'"
+  [class.dods-input--has-float]="hasFloating()"
+>
+  <div class="dods-input__field">
+    @if (_leadingIcon) {
+      <i class="dods-input__icon dods-input__icon--leading" [class]="_leadingIcon" aria-hidden="true"></i>
+    }
+    @if (_prefix) {
+      <span class="dods-input__affix dods-input__affix--prefix">{{ _prefix }}</span>
+    }
+
+    <div class="dods-input__control-wrap">
+      @if (_label) {
+        <label
+          [for]="fieldId"
+          class="dods-input__label"
+          [class.dods-input__label--up]="showFloatingUp()"
+        >
+          {{ _label }}@if (required()) {<span class="dods-input__required">*</span>}
+        </label>
+      }
+      <input
+        class="dods-input__control"
+        [id]="fieldId"
+        [type]="type()"
+        [placeholder]="hasFloating() && !showFloatingUp() ? '' : placeholder()"
+        [disabled]="disabled()"
+        [readOnly]="readonly()"
+        [required]="required()"
+        [attr.autocomplete]="autocomplete()"
+        [attr.aria-invalid]="!!_error ? 'true' : null"
+        [attr.aria-describedby]="_error ? fieldId + '-error' : (_hint ? fieldId + '-hint' : null)"
+        [value]="value()"
+        (input)="onInput($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      />
+    </div>
+
+    @if (_suffix) {
+      <span class="dods-input__affix dods-input__affix--suffix">{{ _suffix }}</span>
+    }
+    @if (_trailingIcon) {
+      <i class="dods-input__icon dods-input__icon--trailing" [class]="_trailingIcon" aria-hidden="true"></i>
+    }
+  </div>
+
+  @if (_error) {
+    <p class="dods-input__message dods-input__message--error" [id]="fieldId + '-error'">{{ _error }}</p>
+  } @else if (_hint) {
+    <p class="dods-input__message dods-input__message--hint" [id]="fieldId + '-hint'">{{ _hint }}</p>
+  }
+</div>

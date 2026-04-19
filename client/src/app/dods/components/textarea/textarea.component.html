@@ -1,0 +1,46 @@
+@let _label = label();
+@let _error = error();
+@let _hint = hint();
+<div
+  class="dods-textarea"
+  [class.dods-textarea--focused]="focused()"
+  [class.dods-textarea--error]="!!_error"
+  [class.dods-textarea--disabled]="disabled()"
+  [class.dods-textarea--sm]="size() === 'sm'"
+  [class.dods-textarea--md]="size() === 'md'"
+  [class.dods-textarea--lg]="size() === 'lg'"
+  [class.dods-textarea--has-float]="hasFloating()"
+>
+  <div class="dods-textarea__field">
+    @if (_label) {
+      <label
+        [for]="fieldId"
+        class="dods-textarea__label"
+        [class.dods-textarea__label--up]="showFloatingUp()"
+      >
+        {{ _label }}@if (required()) {<span class="dods-textarea__required">*</span>}
+      </label>
+    }
+    <textarea
+      #ta
+      class="dods-textarea__control"
+      [id]="fieldId"
+      [rows]="rows()"
+      [placeholder]="hasFloating() && !showFloatingUp() ? '' : placeholder()"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [required]="required()"
+      [attr.aria-invalid]="!!_error ? 'true' : null"
+      [value]="value()"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    ></textarea>
+  </div>
+
+  @if (_error) {
+    <p class="dods-textarea__message dods-textarea__message--error">{{ _error }}</p>
+  } @else if (_hint) {
+    <p class="dods-textarea__message dods-textarea__message--hint">{{ _hint }}</p>
+  }
+</div>

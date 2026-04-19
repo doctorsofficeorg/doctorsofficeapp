@@ -1,0 +1,168 @@
+@use '../../mixins' as dods;
+
+:host {
+  display: inline-block;
+}
+
+:host(.dods-button-host--block) {
+  display: block;
+  width: 100%;
+}
+
+.dods-button {
+  --_bg: var(--dods-brand-primary);
+  --_bg-hover: var(--dods-brand-primary-hover);
+  --_bg-active: var(--dods-brand-primary-active);
+  --_fg: var(--dods-brand-primary-contrast);
+  --_border: transparent;
+  --_shadow:
+    var(--dods-highlight-glass-subtle),
+    var(--dods-shadow-glass-subtle);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dods-space-2);
+  padding: 0 var(--dods-space-4);
+  height: 40px;
+  min-width: 40px;
+  border: 1px solid var(--_border);
+  border-radius: var(--dods-radius-md);
+  background: var(--_bg);
+  color: var(--_fg);
+  font-family: inherit;
+  font-weight: var(--dods-font-weight-semibold);
+  font-size: var(--dods-font-size-base);
+  letter-spacing: 0;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: var(--_shadow);
+  -webkit-backdrop-filter: blur(var(--dods-blur-sm)) saturate(var(--dods-saturate-subtle));
+          backdrop-filter: blur(var(--dods-blur-sm)) saturate(var(--dods-saturate-subtle));
+
+  @include dods.dods-spring-transition(background-color, box-shadow, transform, color);
+  @include dods.dods-press-scale;
+
+  &:hover:not(:disabled) {
+    background: var(--_bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background: var(--_bg-active);
+  }
+
+  &:focus-visible {
+    @include dods.dods-focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // ── Sizes ──
+  &--sm {
+    height: 32px;
+    min-width: 32px;
+    padding: 0 var(--dods-space-3);
+    font-size: var(--dods-font-size-sm);
+    border-radius: var(--dods-radius-sm);
+  }
+
+  &--md {
+    height: 40px;
+    padding: 0 var(--dods-space-4);
+  }
+
+  &--lg {
+    height: 48px;
+    padding: 0 var(--dods-space-5);
+    font-size: var(--dods-font-size-md);
+    border-radius: var(--dods-radius-lg);
+  }
+
+  &--block { width: 100%; }
+
+  // ── Variants ──
+  &--primary {
+    --_bg: var(--dods-brand-primary);
+    --_bg-hover: var(--dods-brand-primary-hover);
+    --_bg-active: var(--dods-brand-primary-active);
+    --_fg: var(--dods-brand-primary-contrast);
+  }
+
+  &--secondary {
+    --_bg: var(--dods-surface-glass);
+    --_bg-hover: var(--dods-surface-glass-elevated);
+    --_bg-active: var(--dods-surface-glass-inset);
+    --_fg: var(--dods-text-primary);
+    --_border: var(--dods-border-glass);
+    --_shadow:
+      var(--dods-highlight-glass),
+      var(--dods-shadow-glass-subtle);
+  }
+
+  &--ghost {
+    --_bg: transparent;
+    --_bg-hover: var(--dods-surface-glass-subtle);
+    --_bg-active: var(--dods-surface-glass);
+    --_fg: var(--dods-text-primary);
+    --_border: transparent;
+    --_shadow: none;
+    -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+
+    &:hover:not(:disabled) {
+      -webkit-backdrop-filter: blur(var(--dods-blur-sm));
+              backdrop-filter: blur(var(--dods-blur-sm));
+    }
+  }
+
+  &--danger {
+    --_bg: var(--dods-feedback-danger);
+    --_bg-hover: #dc2626;
+    --_bg-active: #b91c1c;
+    --_fg: #ffffff;
+  }
+
+  &--success {
+    --_bg: var(--dods-feedback-success);
+    --_bg-hover: #059669;
+    --_bg-active: #047857;
+    --_fg: #ffffff;
+  }
+
+  // ── Loading state ──
+  &--loading .dods-button__label {
+    opacity: 0.7;
+  }
+
+  &__spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: currentColor;
+    animation: dods-button-spin 640ms linear infinite;
+  }
+
+  &__icon {
+    font-size: 1em;
+    line-height: 1;
+
+    &--leading { margin-inline-start: -2px; }
+    &--trailing { margin-inline-end: -2px; }
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+@keyframes dods-button-spin {
+  to { transform: rotate(360deg); }
+}

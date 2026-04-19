@@ -1,0 +1,10 @@
+@let _src = src();
+@let _icon = icon();
+@let _alt = alt() ?? name() ?? '';
+@if (_src) {
+  <img class="dods-avatar__img" [src]="_src" [alt]="_alt" />
+} @else if (_icon) {
+  <i [class]="_icon + ' dods-avatar__icon'" aria-hidden="true"></i>
+} @else {
+  <span class="dods-avatar__initials" [attr.aria-label]="_alt">{{ initials() }}</span>
+}

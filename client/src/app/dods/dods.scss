@@ -1,0 +1,64 @@
+// DODS — Doctors Office Design System
+// Root entry. Import this once from `client/src/styles.scss`.
+
+@use "./tokens";
+@use "./mixins";
+
+// Component-level styles live inside each component's .scss via
+// ViewEncapsulation; globals below only cover things that must escape the
+// component boundary (body backdrop, reduced motion, etc.).
+
+.dods-body {
+  font-family: var(--dods-font-family-base);
+  font-size: var(--dods-font-size-base);
+  color: var(--dods-text-primary);
+  background-color: var(--dods-surface-page);
+  background-image:
+    radial-gradient(
+      at 10% 0%,
+      rgba(13, 148, 136, 0.12) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      at 90% 15%,
+      rgba(99, 102, 241, 0.10) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      at 50% 100%,
+      rgba(245, 158, 11, 0.08) 0%,
+      transparent 60%
+    );
+  background-attachment: fixed;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="dark"] .dods-body {
+  background-image:
+    radial-gradient(
+      at 10% 0%,
+      rgba(20, 184, 166, 0.18) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      at 90% 15%,
+      rgba(99, 102, 241, 0.16) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      at 50% 100%,
+      rgba(245, 158, 11, 0.10) 0%,
+      transparent 60%
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dods-body *,
+  .dods-body *::before,
+  .dods-body *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,79 @@
+@let _label = label();
+@let _error = error();
+@let _hint = hint();
+@let _selected = selectedOption();
+<div
+  #host
+  class="dods-select"
+  [class.dods-select--open]="open()"
+  [class.dods-select--error]="!!_error"
+  [class.dods-select--disabled]="disabled()"
+  [class.dods-select--sm]="size() === 'sm'"
+  [class.dods-select--md]="size() === 'md'"
+  [class.dods-select--lg]="size() === 'lg'"
+>
+  @if (_label) {
+    <label [for]="fieldId" class="dods-select__label">
+      {{ _label }}@if (required()) {<span class="dods-select__required">*</span>}
+    </label>
+  }
+  <button
+    #trigger
+    type="button"
+    class="dods-select__trigger"
+    [id]="fieldId"
+    [disabled]="disabled()"
+    [attr.aria-haspopup]="'listbox'"
+    [attr.aria-expanded]="open() ? 'true' : 'false'"
+    [attr.aria-invalid]="!!_error ? 'true' : null"
+    (click)="toggle()"
+  >
+    <span class="dods-select__value" [class.dods-select__value--placeholder]="!_selected">
+      @if (_selected) {
+        @if (_selected.icon) {
+          <i class="dods-select__value-icon" [class]="_selected.icon" aria-hidden="true"></i>
+        }
+        {{ _selected.label }}
+      } @else {
+        {{ placeholder() }}
+      }
+    </span>
+    <i class="pi pi-chevron-down dods-select__chevron" aria-hidden="true"></i>
+  </button>
+
+  @if (open()) {
+    <div class="dods-select__popover" role="listbox">
+      @for (opt of options(); track opt.value) {
+        <button
+          type="button"
+          class="dods-select__option"
+          [class.dods-select__option--selected]="opt === _selected"
+          [class.dods-select__option--disabled]="opt.disabled"
+          [disabled]="opt.disabled ?? false"
+          [attr.aria-selected]="opt === _selected ? 'true' : 'false'"
+          role="option"
+          (click)="selectOption(opt)"
+        >
+          @if (opt.icon) {
+            <i class="dods-select__option-icon" [class]="opt.icon" aria-hidden="true"></i>
+          }
+          <span class="dods-select__option-content">
+            <span class="dods-select__option-label">{{ opt.label }}</span>
+            @if (opt.description) {
+              <span class="dods-select__option-desc">{{ opt.description }}</span>
+            }
+          </span>
+          @if (opt === _selected) {
+            <i class="pi pi-check dods-select__option-check" aria-hidden="true"></i>
+          }
+        </button>
+      }
+    </div>
+  }
+
+  @if (_error) {
+    <p class="dods-select__message dods-select__message--error">{{ _error }}</p>
+  } @else if (_hint) {
+    <p class="dods-select__message dods-select__message--hint">{{ _hint }}</p>
+  }
+</div>

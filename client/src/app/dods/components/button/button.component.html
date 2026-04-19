@@ -1,0 +1,21 @@
+@let _leading = leadingIcon();
+@let _trailing = trailingIcon();
+@let _label = ariaLabel();
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  [class]="classList()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  [attr.aria-label]="_label"
+  (click)="onClick($event)"
+>
+  @if (loading()) {
+    <span class="dods-button__spinner" aria-hidden="true"></span>
+  } @else if (_leading) {
+    <i class="dods-button__icon dods-button__icon--leading" [class]="_leading" aria-hidden="true"></i>
+  }
+  <span class="dods-button__label"><ng-content /></span>
+  @if (_trailing && !loading()) {
+    <i class="dods-button__icon dods-button__icon--trailing" [class]="_trailing" aria-hidden="true"></i>
+  }
+</button>

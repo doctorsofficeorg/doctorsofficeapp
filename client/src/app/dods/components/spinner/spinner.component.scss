@@ -1,0 +1,41 @@
+:host.dods-spinner {
+  --_size: 20px;
+  --_thickness: 2px;
+  --_track: rgba(15, 23, 42, 0.10);
+  --_fill: var(--dods-brand-primary);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dods-space-2);
+  color: var(--_fill);
+
+  &--xs { --_size: 12px; --_thickness: 2px; }
+  &--sm { --_size: 16px; --_thickness: 2px; }
+  &--md { --_size: 20px; --_thickness: 2px; }
+  &--lg { --_size: 28px; --_thickness: 3px; }
+
+  &--primary { --_fill: var(--dods-brand-primary); }
+  &--neutral { --_fill: var(--dods-text-muted); }
+  &--inverse { --_fill: var(--dods-text-inverse); --_track: rgba(255, 255, 255, 0.25); }
+
+  &__ring {
+    width: var(--_size);
+    height: var(--_size);
+    border-radius: 50%;
+    border: var(--_thickness) solid var(--_track);
+    border-top-color: var(--_fill);
+    animation: dods-spinner-rotate 720ms linear infinite;
+  }
+
+  &__label {
+    font-size: var(--dods-font-size-xs);
+    color: var(--dods-text-muted);
+    font-weight: var(--dods-font-weight-medium);
+  }
+}
+
+:host-context([data-theme="dark"]).dods-spinner { --_track: rgba(255, 255, 255, 0.10); }
+
+@keyframes dods-spinner-rotate {
+  to { transform: rotate(360deg); }
+}

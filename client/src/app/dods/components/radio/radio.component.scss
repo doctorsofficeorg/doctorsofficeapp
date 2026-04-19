@@ -1,0 +1,81 @@
+@use '../../mixins' as dods;
+
+:host { display: block; }
+
+.dods-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dods-space-3);
+
+  &--horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--dods-space-4);
+  }
+}
+
+.dods-radio {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--dods-space-2);
+  cursor: pointer;
+  font-size: var(--dods-font-size-sm);
+  color: var(--dods-text-primary);
+
+  &__native {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  &__dot {
+    @include dods.dods-glass-inset;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    @include dods.dods-spring-transition(background-color, box-shadow, border-color);
+  }
+
+  &__inner {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dods-brand-primary-contrast);
+    transform: scale(0);
+    transition: transform var(--dods-duration-base) var(--dods-ease-spring);
+  }
+
+  &--checked &__dot {
+    background: var(--dods-brand-primary);
+    border-color: var(--dods-brand-primary);
+  }
+
+  &--checked &__inner {
+    transform: scale(1);
+  }
+
+  &__native:focus-visible + &__dot {
+    @include dods.dods-focus-ring;
+  }
+
+  &__text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label { font-weight: var(--dods-font-weight-medium); }
+  &__desc  { color: var(--dods-text-muted); font-size: var(--dods-font-size-xs); }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

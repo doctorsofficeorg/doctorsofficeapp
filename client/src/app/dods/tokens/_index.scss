@@ -1,0 +1,10 @@
+// DODS — Token barrel export.
+// Order matters: primitives first, then semantic layers that reference them.
+
+@forward "colors";
+@forward "typography";
+@forward "spacing";
+@forward "radius";
+@forward "shadows";
+@forward "blur";
+@forward "motion";

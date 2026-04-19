@@ -1,0 +1,54 @@
+:host {
+  --_size: 40px;
+  --_font: var(--dods-font-size-base);
+  --_bg: var(--dods-tint-neutral-bg);
+  --_fg: var(--dods-tint-neutral-text);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--_size);
+  height: var(--_size);
+  background: var(--_bg);
+  color: var(--_fg);
+  font-size: var(--_font);
+  font-weight: var(--dods-font-weight-semibold);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--dods-border-glass-subtle);
+  box-shadow: var(--dods-highlight-glass-subtle);
+  user-select: none;
+}
+
+:host.dods-avatar--circle  { border-radius: 50%; }
+:host.dods-avatar--rounded { border-radius: var(--dods-radius-md); }
+
+:host.dods-avatar--xs { --_size: 24px; --_font: 10px; }
+:host.dods-avatar--sm { --_size: 32px; --_font: 12px; }
+:host.dods-avatar--md { --_size: 40px; --_font: var(--dods-font-size-base); }
+:host.dods-avatar--lg { --_size: 56px; --_font: var(--dods-font-size-lg); }
+:host.dods-avatar--xl { --_size: 80px; --_font: var(--dods-font-size-2xl); }
+
+:host.dods-avatar--neutral   { --_bg: var(--dods-tint-neutral-bg); --_fg: var(--dods-tint-neutral-text); }
+:host.dods-avatar--primary   { --_bg: var(--dods-tint-primary-bg); --_fg: var(--dods-tint-primary-text); }
+:host.dods-avatar--secondary { --_bg: var(--dods-tint-info-bg);    --_fg: var(--dods-tint-info-text); }
+:host.dods-avatar--accent    { --_bg: var(--dods-tint-warning-bg); --_fg: var(--dods-tint-warning-text); }
+:host.dods-avatar--success   { --_bg: var(--dods-tint-success-bg); --_fg: var(--dods-tint-success-text); }
+:host.dods-avatar--warning   { --_bg: var(--dods-tint-warning-bg); --_fg: var(--dods-tint-warning-text); }
+:host.dods-avatar--danger    { --_bg: var(--dods-tint-danger-bg);  --_fg: var(--dods-tint-danger-text); }
+:host.dods-avatar--info      { --_bg: var(--dods-tint-info-bg);    --_fg: var(--dods-tint-info-text); }
+
+.dods-avatar {
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__icon { font-size: calc(var(--_font) * 1.15); }
+
+  &__initials {
+    letter-spacing: 0.02em;
+  }
+}

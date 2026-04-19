@@ -1,0 +1,29 @@
+@let _label = label();
+@let _desc = description();
+<label
+  class="dods-switch"
+  [class.dods-switch--checked]="checked()"
+  [class.dods-switch--disabled]="disabled()"
+  [class.dods-switch--sm]="size() === 'sm'"
+  [class.dods-switch--md]="size() === 'md'"
+  [class.dods-switch--lg]="size() === 'lg'"
+  [for]="fieldId"
+>
+  <button
+    class="dods-switch__track"
+    type="button"
+    role="switch"
+    [id]="fieldId"
+    [attr.aria-checked]="checked() ? 'true' : 'false'"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="dods-switch__thumb" aria-hidden="true"></span>
+  </button>
+  @if (_label || _desc) {
+    <span class="dods-switch__text">
+      @if (_label) { <span class="dods-switch__label">{{ _label }}</span> }
+      @if (_desc)  { <span class="dods-switch__desc">{{ _desc }}</span> }
+    </span>
+  }
+</label>

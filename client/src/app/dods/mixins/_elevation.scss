@@ -1,0 +1,60 @@
+// DODS — Elevation & motion helpers.
+
+@use "sass:list";
+
+@mixin dods-focus-ring {
+  outline: none;
+  box-shadow: var(--dods-ring-focus);
+}
+
+@mixin dods-focus-ring-danger {
+  outline: none;
+  box-shadow: var(--dods-ring-danger);
+}
+
+@mixin dods-spring-transition($properties...) {
+  $count: list.length($properties);
+
+  @if $count == 0 {
+    transition: all var(--dods-duration-base) var(--dods-ease-spring-soft);
+  } @else {
+    $out: ();
+    @for $i from 1 through $count {
+      $prop: list.nth($properties, $i);
+      $out: list.append(
+        $out,
+        #{$prop} var(--dods-duration-base) var(--dods-ease-spring-soft),
+        comma
+      );
+    }
+    transition: $out;
+  }
+}
+
+@mixin dods-press-scale {
+  transition:
+    transform var(--dods-duration-fast) var(--dods-ease-spring-snappy),
+    background-color var(--dods-duration-fast) var(--dods-ease-standard),
+    box-shadow var(--dods-duration-fast) var(--dods-ease-standard);
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
+@mixin dods-hover-lift {
+  transition:
+    transform var(--dods-duration-base) var(--dods-ease-spring-soft),
+    box-shadow var(--dods-duration-base) var(--dods-ease-spring-soft);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+// Respect reduced motion
+@mixin dods-reduce-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}

@@ -1,0 +1,32 @@
+<div
+  class="dods-radio-group"
+  role="radiogroup"
+  [class.dods-radio-group--horizontal]="orientation() === 'horizontal'"
+>
+  @for (opt of options(); track opt.value) {
+    <label
+      class="dods-radio"
+      [class.dods-radio--checked]="value() === opt.value"
+      [class.dods-radio--disabled]="opt.disabled || disabled()"
+    >
+      <input
+        class="dods-radio__native"
+        type="radio"
+        [name]="name()"
+        [value]="opt.value"
+        [checked]="value() === opt.value"
+        [disabled]="opt.disabled || disabled()"
+        (change)="select(opt)"
+      />
+      <span class="dods-radio__dot" aria-hidden="true">
+        <span class="dods-radio__inner"></span>
+      </span>
+      <span class="dods-radio__text">
+        <span class="dods-radio__label">{{ opt.label }}</span>
+        @if (opt.description) {
+          <span class="dods-radio__desc">{{ opt.description }}</span>
+        }
+      </span>
+    </label>
+  }
+</div>

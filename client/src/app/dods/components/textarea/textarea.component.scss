@@ -1,0 +1,88 @@
+@use '../../mixins' as dods;
+
+:host { display: block; width: 100%; }
+
+.dods-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dods-space-1);
+
+  &__field {
+    @include dods.dods-glass-inset;
+    position: relative;
+    padding: var(--dods-space-3);
+    border-radius: var(--dods-radius-md);
+    color: var(--dods-text-primary);
+    @include dods.dods-spring-transition(box-shadow, border-color, background-color);
+  }
+
+  &--lg &__field { border-radius: var(--dods-radius-lg); }
+
+  &--has-float &__field {
+    padding-top: var(--dods-space-5);
+  }
+
+  &__label {
+    position: absolute;
+    left: var(--dods-space-3);
+    top: var(--dods-space-3);
+    transform-origin: left top;
+    color: var(--dods-text-muted);
+    font-size: var(--dods-font-size-base);
+    pointer-events: none;
+    transition:
+      transform var(--dods-duration-base) var(--dods-ease-spring-soft),
+      color var(--dods-duration-base) var(--dods-ease-standard);
+
+    &--up {
+      transform: translateY(-6px) scale(0.82);
+      color: var(--dods-text-secondary);
+      font-weight: var(--dods-font-weight-medium);
+    }
+  }
+
+  &__required {
+    color: var(--dods-feedback-danger);
+    margin-left: 2px;
+  }
+
+  &__control {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    resize: none;
+    line-height: var(--dods-line-height-snug);
+
+    &::placeholder {
+      color: var(--dods-text-muted);
+      opacity: 0.7;
+    }
+  }
+
+  &--focused &__field {
+    @include dods.dods-focus-ring;
+  }
+
+  &--error &__field {
+    @include dods.dods-focus-ring-danger;
+  }
+
+  &--disabled &__field {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &__message {
+    margin: 0;
+    padding: 0 var(--dods-space-1);
+    font-size: var(--dods-font-size-xs);
+
+    &--hint  { color: var(--dods-text-muted); }
+    &--error { color: var(--dods-feedback-danger); font-weight: var(--dods-font-weight-medium); }
+  }
+}

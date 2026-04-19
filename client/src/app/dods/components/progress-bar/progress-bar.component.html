@@ -1,0 +1,19 @@
+@let _label = label();
+@if (_label || showValue()) {
+  <div class="dods-progress__head">
+    @if (_label) { <span class="dods-progress__label">{{ _label }}</span> }
+    @if (showValue() && !indeterminate()) {
+      <span class="dods-progress__value">{{ percent() | number: '1.0-0' }}%</span>
+    }
+  </div>
+}
+<div
+  class="dods-progress__track"
+  role="progressbar"
+  [attr.aria-valuemin]="0"
+  [attr.aria-valuemax]="max()"
+  [attr.aria-valuenow]="indeterminate() ? null : value()"
+  [attr.aria-busy]="indeterminate() ? 'true' : null"
+>
+  <div class="dods-progress__fill" [style.width.%]="indeterminate() ? null : percent()"></div>
+</div>

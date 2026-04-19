@@ -1,0 +1,166 @@
+// DODS — Color tokens
+// All colors exposed as CSS custom properties so they can be overridden at runtime
+// for per-clinic branding and light/dark theme switching.
+
+:root {
+  // ── Primary: Teal ──
+  --dods-color-primary-50:  #f0fdfa;
+  --dods-color-primary-100: #ccfbf1;
+  --dods-color-primary-200: #99f6e4;
+  --dods-color-primary-300: #5eead4;
+  --dods-color-primary-400: #2dd4bf;
+  --dods-color-primary-500: #14b8a6;
+  --dods-color-primary-600: #0d9488;
+  --dods-color-primary-700: #0f766e;
+  --dods-color-primary-800: #115e59;
+  --dods-color-primary-900: #134e4a;
+
+  // ── Secondary: Indigo ──
+  --dods-color-secondary-400: #818cf8;
+  --dods-color-secondary-500: #6366f1;
+  --dods-color-secondary-600: #4f46e5;
+
+  // ── Accent: Amber ──
+  --dods-color-accent-400: #fbbf24;
+  --dods-color-accent-500: #f59e0b;
+  --dods-color-accent-600: #d97706;
+
+  // ── Neutral (Pearl / Slate) ──
+  --dods-color-neutral-0:   #ffffff;
+  --dods-color-neutral-25:  #f9fafb;
+  --dods-color-neutral-50:  #f8fafc;
+  --dods-color-neutral-100: #f1f5f9;
+  --dods-color-neutral-200: #e2e8f0;
+  --dods-color-neutral-300: #cbd5e1;
+  --dods-color-neutral-400: #94a3b8;
+  --dods-color-neutral-500: #64748b;
+  --dods-color-neutral-600: #475569;
+  --dods-color-neutral-700: #334155;
+  --dods-color-neutral-800: #1e293b;
+  --dods-color-neutral-900: #0b1220;
+
+  // ── Feedback (Emerald / Amber / Rose / Blue) ──
+  --dods-color-success-400: #34d399;
+  --dods-color-success-500: #10b981;
+  --dods-color-success-600: #059669;
+  --dods-color-warning-400: #fbbf24;
+  --dods-color-warning-500: #f59e0b;
+  --dods-color-warning-600: #d97706;
+  --dods-color-danger-400:  #f87171;
+  --dods-color-danger-500:  #ef4444;
+  --dods-color-danger-600:  #dc2626;
+  --dods-color-info-400:    #60a5fa;
+  --dods-color-info-500:    #3b82f6;
+  --dods-color-info-600:    #2563eb;
+
+  // ── Alpha steps (used by glass surfaces) ──
+  --dods-alpha-white-8:  rgba(255, 255, 255, 0.08);
+  --dods-alpha-white-10: rgba(255, 255, 255, 0.10);
+  --dods-alpha-white-14: rgba(255, 255, 255, 0.14);
+  --dods-alpha-white-25: rgba(255, 255, 255, 0.25);
+  --dods-alpha-white-35: rgba(255, 255, 255, 0.35);
+  --dods-alpha-white-45: rgba(255, 255, 255, 0.45);
+  --dods-alpha-white-55: rgba(255, 255, 255, 0.55);
+  --dods-alpha-white-60: rgba(255, 255, 255, 0.60);
+  --dods-alpha-white-72: rgba(255, 255, 255, 0.72);
+  --dods-alpha-white-92: rgba(255, 255, 255, 0.92);
+  --dods-alpha-black-25: rgba(0, 0, 0, 0.25);
+  --dods-alpha-slate-40: rgba(17, 24, 39, 0.40);
+  --dods-alpha-slate-55: rgba(17, 24, 39, 0.55);
+  --dods-alpha-slate-70: rgba(17, 24, 39, 0.70);
+  --dods-alpha-slate-88: rgba(17, 24, 39, 0.88);
+
+  // ── Semantic (light mode — default) ──
+  --dods-brand-primary:          var(--dods-color-primary-600);
+  --dods-brand-primary-hover:    var(--dods-color-primary-700);
+  --dods-brand-primary-active:   var(--dods-color-primary-800);
+  --dods-brand-primary-contrast: #ffffff;
+  --dods-brand-secondary:        var(--dods-color-secondary-500);
+  --dods-brand-accent:           var(--dods-color-accent-500);
+
+  --dods-feedback-success: var(--dods-color-success-500);
+  --dods-feedback-warning: var(--dods-color-warning-500);
+  --dods-feedback-danger:  var(--dods-color-danger-500);
+  --dods-feedback-info:    var(--dods-color-info-500);
+
+  --dods-surface-page:           #f4f6fb;
+  --dods-surface-solid:          var(--dods-color-neutral-0);
+  --dods-surface-glass-subtle:   var(--dods-alpha-white-45);
+  --dods-surface-glass:          var(--dods-alpha-white-60);
+  --dods-surface-glass-elevated: var(--dods-alpha-white-72);
+  --dods-surface-glass-inset:    var(--dods-alpha-white-35);
+  --dods-surface-glass-fallback: var(--dods-alpha-white-92);
+  --dods-surface-scrim:          rgba(15, 23, 42, 0.35);
+
+  --dods-border-glass-subtle:    var(--dods-alpha-white-35);
+  --dods-border-glass:           var(--dods-alpha-white-45);
+  --dods-border-glass-elevated:  var(--dods-alpha-white-55);
+  --dods-border-subtle:          rgba(15, 23, 42, 0.08);
+  --dods-border-strong:          rgba(15, 23, 42, 0.16);
+
+  --dods-text-primary:   var(--dods-color-neutral-900);
+  --dods-text-secondary: var(--dods-color-neutral-700);
+  --dods-text-muted:     var(--dods-color-neutral-500);
+  --dods-text-inverse:   #ffffff;
+
+  // Tinted (for soft-filled badges/chips)
+  --dods-tint-primary-bg:   rgba(13, 148, 136, 0.12);
+  --dods-tint-primary-text: var(--dods-color-primary-700);
+  --dods-tint-success-bg:   rgba(16, 185, 129, 0.14);
+  --dods-tint-success-text: var(--dods-color-success-600);
+  --dods-tint-warning-bg:   rgba(245, 158, 11, 0.14);
+  --dods-tint-warning-text: var(--dods-color-warning-600);
+  --dods-tint-danger-bg:    rgba(239, 68, 68, 0.14);
+  --dods-tint-danger-text:  var(--dods-color-danger-600);
+  --dods-tint-info-bg:      rgba(59, 130, 246, 0.14);
+  --dods-tint-info-text:    var(--dods-color-info-600);
+  --dods-tint-neutral-bg:   rgba(100, 116, 139, 0.14);
+  --dods-tint-neutral-text: var(--dods-color-neutral-700);
+}
+
+[data-theme="dark"] {
+  --dods-brand-primary:          var(--dods-color-primary-400);
+  --dods-brand-primary-hover:    var(--dods-color-primary-300);
+  --dods-brand-primary-active:   var(--dods-color-primary-200);
+  --dods-brand-primary-contrast: var(--dods-color-neutral-900);
+  --dods-brand-secondary:        var(--dods-color-secondary-400);
+  --dods-brand-accent:           var(--dods-color-accent-400);
+
+  --dods-feedback-success: var(--dods-color-success-400);
+  --dods-feedback-warning: var(--dods-color-warning-400);
+  --dods-feedback-danger:  var(--dods-color-danger-400);
+  --dods-feedback-info:    var(--dods-color-info-400);
+
+  --dods-surface-page:           #0b1220;
+  --dods-surface-solid:          var(--dods-color-neutral-800);
+  --dods-surface-glass-subtle:   var(--dods-alpha-slate-40);
+  --dods-surface-glass:          var(--dods-alpha-slate-55);
+  --dods-surface-glass-elevated: var(--dods-alpha-slate-70);
+  --dods-surface-glass-inset:    var(--dods-alpha-black-25);
+  --dods-surface-glass-fallback: var(--dods-alpha-slate-88);
+  --dods-surface-scrim:          rgba(0, 0, 0, 0.60);
+
+  --dods-border-glass-subtle:    var(--dods-alpha-white-8);
+  --dods-border-glass:           var(--dods-alpha-white-10);
+  --dods-border-glass-elevated:  var(--dods-alpha-white-14);
+  --dods-border-subtle:          var(--dods-alpha-white-8);
+  --dods-border-strong:          var(--dods-alpha-white-14);
+
+  --dods-text-primary:   var(--dods-color-neutral-100);
+  --dods-text-secondary: var(--dods-color-neutral-300);
+  --dods-text-muted:     var(--dods-color-neutral-400);
+  --dods-text-inverse:   var(--dods-color-neutral-900);
+
+  --dods-tint-primary-bg:   rgba(45, 212, 191, 0.16);
+  --dods-tint-primary-text: var(--dods-color-primary-300);
+  --dods-tint-success-bg:   rgba(52, 211, 153, 0.18);
+  --dods-tint-success-text: var(--dods-color-success-400);
+  --dods-tint-warning-bg:   rgba(251, 191, 36, 0.18);
+  --dods-tint-warning-text: var(--dods-color-warning-400);
+  --dods-tint-danger-bg:    rgba(248, 113, 113, 0.18);
+  --dods-tint-danger-text:  var(--dods-color-danger-400);
+  --dods-tint-info-bg:      rgba(96, 165, 250, 0.18);
+  --dods-tint-info-text:    var(--dods-color-info-400);
+  --dods-tint-neutral-bg:   rgba(148, 163, 184, 0.18);
+  --dods-tint-neutral-text: var(--dods-color-neutral-300);
+}
