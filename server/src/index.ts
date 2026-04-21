@@ -64,11 +64,28 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 // ---------------------------------------------------------------------------
 // Startup
 // ---------------------------------------------------------------------------
+let resolvedMongoUri = config.mongodbUri;
+
+async function resolveMongoUri(): Promise<string> {
+  // USE_MEMORY_DB=true spins up an in-process MongoDB (mongodb-memory-server).
+  // Useful for local dev / demos when no real MongoDB instance is available.
+  if (process.env.USE_MEMORY_DB === "true") {
+    console.log("[MongoDB] USE_MEMORY_DB=true — starting in-memory MongoDB...");
+    const { MongoMemoryServer } = await import("mongodb-memory-server");
+    const mem = await MongoMemoryServer.create();
+    const uri = mem.getUri();
+    console.log(`[MongoDB] In-memory instance ready at ${uri}`);
+    return uri;
+  }
+  return config.mongodbUri;
+}
+
 async function start(): Promise<void> {
   try {
     // Connect to MongoDB
+    resolvedMongoUri = await resolveMongoUri();
     console.log("[MongoDB] Connecting...");
-    await mongoose.connect(config.mongodbUri);
+    await mongoose.connect(resolvedMongoUri);
     console.log("[MongoDB] Connected successfully");
 
     // One-shot cleanup: drop any legacy global unique indexes on Patient
@@ -99,7 +116,7 @@ async function start(): Promise<void> {
       console.log(`  Doctors Office API Server`);
       console.log(`  Environment : ${config.nodeEnv}`);
       console.log(`  Port        : ${config.port}`);
-      console.log(`  MongoDB     : ${config.mongodbUri}`);
+      console.log(`  MongoDB     : ${resolvedMongoUri}`);
       console.log(`  Redis       : ${config.redisHost}:${config.redisPort}`);
       console.log("─────────────────────────────────────────");
     });
